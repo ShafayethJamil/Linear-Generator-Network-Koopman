@@ -1,0 +1,6 @@
+# versions used for the paper (Python 3.10, CUDA 12.8)
+torch==2.8.0
+numpy==2.2.6
+scipy==1.15.3
+h5py==3.16.0
+pandas==2.2.3

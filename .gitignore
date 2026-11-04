@@ -1,0 +1,7 @@
+checkpoints/**/*.pt
+data/**/*.mat
+data/**/*.zip
+nlse/runs/
+__pycache__/
+*.pyc
+*.tar.gz

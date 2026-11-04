@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper."
+title: "LGN-KM: Linear Generator Networks for Nonlinear Partial Differential Equations"
+authors:
+  - family-names: Jamil
+    given-names: Shafayeth
+    affiliation: University of Southern California
+  - family-names: Kapadia
+    given-names: Rehan
+    affiliation: University of Southern California
+repository-code: "https://github.com/GITHUB_OWNER/lgn-km"
+license: MIT
+preferred-citation:
+  type: conference-paper
+  title: "Linear Generator Networks for Nonlinear Partial Differential Equations"
+  authors:
+    - family-names: Jamil
+      given-names: Shafayeth
+    - family-names: Kapadia
+      given-names: Rehan
+  collection-title: "Advances in Neural Information Processing Systems (NeurIPS)"
+  year: 2026

@@ -1,0 +1,122 @@
+{
+ "ns/lgnkm_nu1e5_s0.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints/best_koopman_nu1e5_raw.pt",
+  "sha256": "9c899fc17f99c0f367735aa18c7c02b72af34f1637a34ec750a33b5ea622753c",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns/lgnkm_nu1e5_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Multiseed/checkpoints/best_koopman_nu1e5_s1.pt",
+  "sha256": "2f49a08a510a1c7d10aa975d797ecfb64caa94ec8ed794bfc76166c72e01f134",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns/lgnkm_nu1e5_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Multiseed/checkpoints/best_koopman_nu1e5_s2.pt",
+  "sha256": "fc831e9e657653afac6a0758e07c981bdb6f6bca48b6c8d1e44812a952d9f1f1",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns/fno_nu1e5.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints/best_fno_nu1e5_raw.pt",
+  "sha256": "ced8d906e361fdd73797080b4bc7bf63a17b6de3ef5aed54d53fcf0ccab0a90e",
+  "selection": "lowest test L2 over 50 evaluations (every 10 epochs)"
+ },
+ "ns/lgnkm_nu1e3_s0.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints/best_koopman_nu1e3_raw.pt",
+  "sha256": "dda4ef1f65d5d89398da1957cffdcbd41c6b331a5b151ebc43d5808803cd6663",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns/lgnkm_nu1e3_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Multiseed/checkpoints/best_koopman_nu1e3_s1.pt",
+  "sha256": "432404bd63fffd9cd75671e5226f142b22572c9b79bfd8eb954dfe71fee2dcb8",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns/lgnkm_nu1e3_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Multiseed/checkpoints/best_koopman_nu1e3_s2.pt",
+  "sha256": "5af37fef022205a03412e578ee313eb0a8c7f6e727a11421aa578e6f807d4e74",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns/fno_nu1e3.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints/best_fno_nu1e3_raw.pt",
+  "sha256": "dd5f2829f0417033cb697fea3a9a1301b7c8ce04b7f250db3d14e3195af5c755",
+  "selection": "lowest test L2 over 50 evaluations (every 10 epochs)"
+ },
+ "nlse/b2_10_s0.pt": {
+  "source": "/home/shafayeth/final_rebuttal/results_beta2_cx/best_koopman_nlse_b2_10_cx.pt",
+  "sha256": "d6372b23172c4ec9bc20c5b68a5453a1fb5f5b6a73efd6911efca704b0fe8fa4",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final agree within 1e-4"
+ },
+ "nlse/b2_10_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_10_s1.pt",
+  "sha256": "3b22322a16e98c158a1428de32547d04a8c669112fa2f34d12b1bcd19d7ad2a1",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_10_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_10_s2.pt",
+  "sha256": "4df0c6a553128c58f43ea9689c7e63102a1e746484bc6305e7638aae88825af1",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_15_s0.pt": {
+  "source": "/home/shafayeth/final_rebuttal/results_beta2_cx/best_koopman_nlse_b2_15_cx.pt",
+  "sha256": "5df318c090e269bf92b19dfb3c38c3732a709a04de7d773e7878001c9fc94503",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final agree within 1e-4"
+ },
+ "nlse/b2_15_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_15_s1.pt",
+  "sha256": "63a7a5f4a1f217146807ae2dc3696da1b84e3b0c946b24e011fba809fe54a4a8",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_15_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_15_s2.pt",
+  "sha256": "585625ea9a413f1e0f9494c892a37383b43ffb74ae6765e5eed94f049014c69e",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_20_s0.pt": {
+  "source": "/home/shafayeth/final_rebuttal/results_beta2_cx/best_koopman_nlse_b2_20_cx.pt",
+  "sha256": "fd3b0c656092c49b8901346df1482fb2e1a407524a43d9e993998b9f0848dc5c",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final agree within 1e-4"
+ },
+ "nlse/b2_20_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_20_s1.pt",
+  "sha256": "8a4e6b2f752257e0b7d3a4a96a1b8c89e1401892e22e687f628e9650574748c0",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_20_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_20_s2.pt",
+  "sha256": "f70dd5d2787a571cfe95e94470b61dccfb47c54f856fb254706569654017540e",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_25_s0.pt": {
+  "source": "/home/shafayeth/final_rebuttal/results_beta2_cx/best_koopman_nlse_b2_25_cx.pt",
+  "sha256": "a8e9a1bfb3afc2313cd5dfc4b9bb4ee1d3e9d4935dcbc0871e7b0aa1b2a9b872",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final agree within 1e-4"
+ },
+ "nlse/b2_25_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_25_s1.pt",
+  "sha256": "2b23a0cd4b09f8158be830ac6de29715dcb253e8443221fc99abe5f231523b95",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_25_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_25_s2.pt",
+  "sha256": "4a172ddd5e2ac0981ec9d0934ba0663a7f28d39515909b88fdff1b1fe7dddb66",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_30_s0.pt": {
+  "source": "/home/shafayeth/final_rebuttal/results_beta2_cx/best_koopman_nlse_b2_30_cx.pt",
+  "sha256": "dcffad69ae8846591b63a5324efca4e1be7430ae05160546dbf542d827265df0",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final agree within 1e-4"
+ },
+ "nlse/b2_30_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_30_s1.pt",
+  "sha256": "14736d828dabf35f20f03dc896dfdd3c624d2e44206451f42a2508b3b4df6525",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_30_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/nlse_ladder/ckpt/final_koopman_nlse_b2_30_s2.pt",
+  "sha256": "f8f7281867c92a00ead54434c69fed3474730dad4e60996bbfe2d9fde5afd683",
+  "selection": "final epoch (run ledger)"
+ },
+ "nlse/b2_5_s0.pt": {
+  "source": "/home/shafayeth/final_rebuttal/exploratory_below_resolution/results_beta2_cx/best_koopman_nlse_b2_5_cx.pt",
+  "sha256": "eae4e1f37524c580494b11587094e767525b255cc226f721c69361a9430fd0ec",
+  "selection": "lowest test L2 over 500 epochs (no validation split); below the readout lower bound, Appendix A.8 (i)"
+ }
+}
