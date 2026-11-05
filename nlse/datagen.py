@@ -271,7 +271,7 @@ def main():
     print(f"{'='*70}")
     print(f"\nNext: train models with, e.g.:")
     print(f"    python nlse/train_nlse.py --data {args.save_dir}/nlse_b2_20_soliton.mat \\")
-    print(f"      --field complex --tag b2_20_s1 --seed 1 --save_dir checkpoints/nlse")
+    print(f"      --field complex --tag b2_20_s1 --seed 1 --save_dir outputs/nlse")
 
 
 if __name__ == '__main__':

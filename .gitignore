@@ -2,8 +2,8 @@
 checkpoints/**
 !checkpoints/
 !checkpoints/MANIFEST*.json
-data/**/*.mat
-data/**/*.zip
+data/**
+!data/README.md
 outputs/
 runs/
 transfer/runs/
