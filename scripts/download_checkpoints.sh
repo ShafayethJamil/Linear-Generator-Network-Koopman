@@ -2,7 +2,7 @@
 # Download the released checkpoints (40 MB) into checkpoints/ and check their SHA-256.
 set -e
 cd "$(dirname "$0")/.."
-URL=https://github.com/GITHUB_OWNER/lgn-km/releases/download/v1.0/lgnkm_checkpoints_v1.tar.gz
+URL=https://github.com/ShafayethJamil/lgn-km/releases/download/v1.0/lgnkm_checkpoints_v1.tar.gz
 curl -L --fail -o lgnkm_checkpoints_v1.tar.gz "$URL"
 tar -xzf lgnkm_checkpoints_v1.tar.gz
 rm lgnkm_checkpoints_v1.tar.gz
