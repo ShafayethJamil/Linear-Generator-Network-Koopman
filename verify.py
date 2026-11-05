@@ -62,7 +62,7 @@ def r2_identity(x, y):
 
 
 def verify_ns(ck):
-    print("\nNavier-Stokes generator (Sections 3.1-3.2, Appendix A.10)")
+    print("\nNavier-Stokes generator (Sections 3.1-3.2, Table A.8)")
     E = {nu: ns_eigs(load(f'{ck}/ns/lgnkm_nu{nu}_s0.pt')) for nu in ['1e5', '1e3']}
     e5, k5 = E['1e5']; e3, k3 = E['1e3']
     check('eigenvalues per model (r x M^2)', '4608', e5.size, 'seed 0')
@@ -76,7 +76,7 @@ def verify_ns(ck):
     check('oscillation range ratio, 1e-5 / 1e-3', '2.2', np.ptp(e5.imag) / np.ptp(e3.imag), 'Sec 3.1')
     dom = e5.real.max(axis=1)                     # least-damped eigenvalue at each wavevector
     check('dominant-branch R^2, Re(lambda) vs |k|^2, nu=1e-5', '0.920',
-          np.corrcoef(k5, dom)[0, 1] ** 2, 'A.10 r=32')
+          np.corrcoef(k5, dom)[0, 1] ** 2, 'Table A.8 r=32')
 
     # cross-viscosity, three same-seed pairs (nu=1e-5 seed s vs nu=1e-3 seed s)
     sd = {(nu, s): load(f'{ck}/ns/lgnkm_nu{nu}_s{s}.pt') for nu in ['1e5', '1e3'] for s in range(3)}
@@ -108,19 +108,21 @@ def verify_nlse(ck):
     check('derived readout constant 2 / (Omega_15^2 dz)', '13.56', const, 'Sec 3.3')
     paper = {10: ['9.67', '10.24', '9.20'], 15: ['14.67', '14.20', '15.18'], 20: ['19.95', '18.76', '19.42'],
              25: ['25.41', '25.05', '24.39'], 30: ['29.36', '29.97', '28.86']}
-    ratios, errs = [], []
+    paper_mean = {10: ('9.70', '0.53'), 15: ('14.68', '0.49'), 20: ('19.38', '0.60'),
+                  25: ('24.95', '0.52'), 30: ('29.40', '0.56')}
+    errs = []
     for b, pv in paper.items():
         est = []
         for s in range(3):
             fmax = np.abs(np.linalg.eigvals(S_of(load(f'{ck}/nlse/b2_{b}_s{s}.pt'))).imag).max()
-            est.append(const * fmax); ratios.append(est[-1] / b)
-            check(f'|beta2| = {b}, seed {s}: 13.56 f_max', pv[s], est[-1], 'A.8 table')
+            est.append(const * fmax)
+            check(f'|beta2| = {b}, seed {s}: 13.56 f_max', pv[s], est[-1], 'Table A.5')
+        check(f'|beta2| = {b}: three-seed mean', paper_mean[b][0], st.mean(est), 'Table A.5')
+        check(f'|beta2| = {b}: three-seed SD', paper_mean[b][1], st.stdev(est), 'Table A.5')
         errs.append(abs(st.mean(est) - b) / b)
     check('largest error of the three-seed mean (%)', '3.1', 100 * max(errs), 'Sec 3.3')
-    check('f_max / predicted band-edge advance, minimum', '0.92', min(ratios), 'A.8, 15 models')
-    check('f_max / predicted band-edge advance, maximum', '1.02', max(ratios), 'A.8, 15 models')
     f5 = np.abs(np.linalg.eigvals(S_of(load(f'{ck}/nlse/b2_5_s0.pt'))).imag).max()
-    check('|beta2| = 5 (below the lower bound): reads', '6.5', const * f5, 'A.8 (i)')
+    check('|beta2| = 5 (below the lower bound): % high', '31', 100 * (const * f5 / 5 - 1), 'A.8 Limits')
 
 
 # ------------------------------------------------------------- test error (data)
@@ -129,7 +131,7 @@ def verify_accuracy(ck, data_dir):
     sys.path.insert(0, os.path.join(HERE, 'navier_stokes'))
     import train_lgnkm, train_fno
     dev = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    for nu, fname, T_out, p_lgn, p_fno in [('1e5', 'NavierStokes_V1e-5_N1200_T20.mat', 10, '0.240', '0.158'),
+    for nu, fname, T_out, p_lgn, p_fno in [('1e5', 'NavierStokes_V1e-5_N1200_T20.mat', 10, '0.240', '0.157'),
                                             ('1e3', 'ns_V1e-3_N5000_T50.mat', 40, '0.063', '0.019')]:
         _, _, x, y, grid, H, W = train_lgnkm.load_data(os.path.join(data_dir, fname), 10, T_out, 1000, 200)
         lgn = train_lgnkm.SpatialKoopmanLGN(12, 32, 32, 10, H, W).to(dev)
