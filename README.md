@@ -11,7 +11,7 @@ LGN-KM lifts a nonlinear field into a latent space and learns the continuous-tim
 ```bash
 pip install -r requirements.txt
 bash scripts/download_checkpoints.sh       # all checkpoints of the paper (~300 MB) into checkpoints/
-python verify.py                           # checkpoints and shipped result files only, CPU, ~1 min
+python verify.py                           # checkpoints and shipped result files only, CPU, a few seconds
 python verify.py --data_dir data/ns        # also re-evaluates test errors (GPU recommended)
 ```
 
