@@ -4,3 +4,6 @@ numpy==2.2.6
 scipy==1.15.3
 h5py==3.16.0
 pandas==2.2.3
+matplotlib==3.8.4
+# optional: only for the KNO baseline (baselines/kno.py, KNO rows of long_horizon/eval_long_horizon.py)
+# koopmanlab==1.0.3
