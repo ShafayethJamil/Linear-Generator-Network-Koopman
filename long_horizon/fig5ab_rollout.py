@@ -1,32 +1,14 @@
-"""
-Koopman-LGN Sledgehammer Analyses
-====================================
-Run all 4 killer experiments from checkpoints.
+"""Roll out LGN-KM and FNO on the nu = 1e-5 benchmark: per-step error and 200-step energy.
 
-    1. Viscosity recovery — read ν from eigenspectrum
-    2. Eigenspectrum comparison — ν=1e-3 vs ν=1e-5 side by side
-    3. OOD transfer — train ν=1e-3, rescale D_k, test ν=1e-5
-    4. Long-horizon rollout — Koopman (one expm) vs FNO (autoregressive)
+Paper: Section 4.1, Fig. 5a (per-step relative L2, 200 test trajectories, t = 1..10) and
+Fig. 5b (decoded mean enstrophy over 200 steps, 5 test trajectories, no ground truth).
 
-The paper uses analysis 4 (long-horizon rollout), which produces Fig. 5a
-(per-step error, 200 test trajectories, t = 1..10) and Fig. 5b (decoded mean
-enstrophy over 200 steps, 5 test trajectories, no ground truth). Analyses 1-3
-are exploratory and not in the paper. Original file name: sledgehammer.py.
+Usage:
+    python long_horizon/fig5ab_rollout.py --data_1e5 data/ns/NavierStokes_V1e-5_N1200_T20.mat \
+        --ckpt_koopman_1e5 checkpoints/ns/lgnkm_nu1e5_s0.pt --ckpt_fno_1e5 checkpoints/ns/fno_nu1e5.pt
 
-Usage (from the repository root):
-    python long_horizon/fig5ab_rollout.py \
-        --data_1e5 data/ns/NavierStokes_V1e-5_N1200_T20.mat \
-        --ckpt_koopman_1e5 checkpoints/ns/lgnkm_nu1e5_s0.pt \
-        --ckpt_koopman_1e3 checkpoints/ns/lgnkm_nu1e3_s0.pt \
-        --ckpt_fno_1e5 checkpoints/ns/fno_nu1e5.pt --save_dir outputs/fig5ab
-Shipped output: long_horizon/results/fig5ab/long_horizon_{per_step,energy,summary}.csv
-
-Outputs:
-    figures/fig_eigenspectrum_comparison.png
-    figures/fig_ood_transfer.png
-    figures/fig_long_horizon.png
-    figures/fig_viscosity_sweep.png
-    + printed results for paper text
+Writes long_horizon_{per_step,energy,summary}.csv and fig_long_horizon.png to --save_dir.
+The paper's output is in long_horizon/results/fig5ab/.
 """
 
 import torch
@@ -37,7 +19,6 @@ import numpy as np
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
 import argparse, os
 
 torch.manual_seed(0)
@@ -234,338 +215,14 @@ def paper_rel_l2(pred, target):
 
 
 # ============================================================
-# SLEDGEHAMMER 1: Viscosity Recovery
-# ============================================================
-
-def analysis_viscosity_recovery(ckpt_1e5, ckpt_1e3, device):
-    print("\n" + "="*70)
-    print("SLEDGEHAMMER 1: Viscosity Recovery from Eigenspectrum")
-    print("="*70)
-
-    results = {}
-    for label, path, nu_true in [("ν=1e-5", ckpt_1e5, 1e-5),
-                                  ("ν=1e-3", ckpt_1e3, 1e-3)]:
-        state = torch.load(path, map_location=device, weights_only=False)
-
-        P = state['P']
-        d_raw = state['d']
-        alpha_raw = state['alpha']
-        k2_norm = state['k2_norm']
-        modes = k2_norm.shape[0]
-
-        S = (P - P.T) / 2.0
-        d0 = F.softplus(d_raw)
-        a0 = F.softplus(alpha_raw)
-
-        # Build L_k for all modes, get dominant eigenvalue per mode
-        dom_re = np.zeros((modes, modes))
-        k2_raw = np.zeros((modes, modes))
-
-        for i in range(modes):
-            for j in range(modes):
-                D_diag = d0 + a0 * k2_norm[i, j]
-                L = S - torch.diag(D_diag)
-                eigs = torch.linalg.eigvals(L)
-                dom_re[i, j] = eigs.real.max().item()
-                k2_raw[i, j] = i**2 + j**2
-
-        # Linear regression: Re(λ) = slope * |k|^2 + intercept
-        k2_flat = k2_raw.flatten()
-        re_flat = dom_re.flatten()
-        mask = k2_flat > 0  # exclude (0,0)
-        from numpy.polynomial.polynomial import polyfit
-        coeffs = np.polyfit(k2_flat[mask], re_flat[mask], 1)
-        slope = coeffs[0]
-        intercept = coeffs[1]
-        r2 = 1 - np.sum((re_flat[mask] - (slope * k2_flat[mask] + intercept))**2) / \
-                 np.sum((re_flat[mask] - re_flat[mask].mean())**2)
-
-        # Viscosity recovery
-        # Physical: Re(λ_k) ≈ -ν|k|^2, so slope ≈ -ν_effective
-        # But slope is in raw |k|^2, and the model uses |k|^2/kmax^2 internally
-        # The learned slope against raw |k|^2 absorbs normalization + S cancellation
-        nu_recovered = -slope  # effective ν in model coordinates
-
-        # Factor out kmax^2 normalization: model uses alpha * |k|^2/kmax^2
-        # So the raw slope = -alpha_eff / kmax^2
-        alpha_mean = a0.mean().item()
-        kmax2 = modes**2
-        nu_from_alpha = alpha_mean / kmax2
-
-        # S cancellation factor
-        c_S = nu_from_alpha / nu_recovered if nu_recovered > 0 else float('nan')
-
-        results[label] = {
-            'nu_true': nu_true,
-            'slope': slope,
-            'intercept': intercept,
-            'r2': r2,
-            'nu_recovered_raw': nu_recovered,
-            'alpha_mean': alpha_mean,
-            'kmax2': kmax2,
-            'nu_from_alpha': nu_from_alpha,
-            'c_S': c_S,
-            'dom_re': dom_re,
-            'k2_raw': k2_raw,
-            'd0_mean': d0.mean().item(),
-            'a0': a0,
-            'd0': d0,
-        }
-
-        print(f"\n  [{label}] (true ν = {nu_true})")
-        print(f"    R² (Re(λ) vs |k|²):     {r2:.4f}")
-        print(f"    Slope (raw |k|²):        {slope:.6f}")
-        print(f"    softplus(alpha) mean:    {alpha_mean:.4f}")
-        print(f"    softplus(d0) mean:       {d0.mean().item():.4f}")
-        print(f"    α/kmax²:                 {nu_from_alpha:.6f}")
-        print(f"    -slope (ν_eff):          {nu_recovered:.6f}")
-
-    # Ratio test: if eigenspectrum is physical, slopes should scale with ν
-    s5 = results["ν=1e-5"]['slope']
-    s3 = results["ν=1e-3"]['slope']
-    ratio = s5 / s3 if s3 != 0 else float('nan')
-
-    print(f"\n  RATIO TEST:")
-    print(f"    slope(1e-5) / slope(1e-3) = {ratio:.4f}")
-    print(f"    Expected (ν ratio):          {1e-5/1e-3:.4f} = 0.01")
-    print(f"    Actual / Expected:           {ratio/0.01:.2f}×")
-
-    a5 = results["ν=1e-5"]['alpha_mean']
-    a3 = results["ν=1e-3"]['alpha_mean']
-    alpha_ratio = a5 / a3 if a3 != 0 else float('nan')
-    print(f"    alpha(1e-5) / alpha(1e-3) = {alpha_ratio:.4f}")
-    print(f"    (should be ~0.01 if alpha ∝ ν)")
-
-    return results
-
-
-# ============================================================
-# SLEDGEHAMMER 2: Eigenspectrum Comparison Figure
-# ============================================================
-
-def analysis_eigenspectrum_figure(results, save_dir):
-    print("\n" + "="*70)
-    print("SLEDGEHAMMER 2: Eigenspectrum Comparison Figure")
-    print("="*70)
-
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-    # Panel A: Re(λ) vs |k|² for both viscosities
-    ax = axes[0]
-    for label, color, marker in [("ν=1e-5", "#2196F3", 'o'), ("ν=1e-3", "#FF5722", 's')]:
-        r = results[label]
-        k2 = r['k2_raw'].flatten()
-        re = r['dom_re'].flatten()
-        mask = k2 > 0
-        ax.scatter(k2[mask], re[mask], c=color, s=12, alpha=0.5, label=f'{label} (R²={r["r2"]:.3f})')
-        # Fit line
-        x_fit = np.linspace(0, k2.max(), 100)
-        y_fit = r['slope'] * x_fit + r['intercept']
-        ax.plot(x_fit, y_fit, color=color, linewidth=2, linestyle='--')
-
-    ax.set_xlabel('|k|²', fontsize=13)
-    ax.set_ylabel('Re(λ_dominant)', fontsize=13)
-    ax.set_title('Learned Dissipation Rate vs Wavenumber', fontsize=14)
-    ax.legend(fontsize=11)
-    ax.axhline(y=0, color='gray', linestyle=':', alpha=0.5)
-
-    # Panel B: Heatmap for ν=1e-5
-    ax = axes[1]
-    r = results["ν=1e-5"]
-    im = ax.imshow(r['dom_re'], cmap='viridis', origin='lower',
-                   extent=[0, r['dom_re'].shape[1]-1, 0, r['dom_re'].shape[0]-1])
-    plt.colorbar(im, ax=ax, label='Re(λ_dominant)')
-    ax.set_xlabel('k₂', fontsize=13)
-    ax.set_ylabel('k₁', fontsize=13)
-    ax.set_title('ν=1e-5: Mode Decay Rates', fontsize=14)
-
-    # Panel C: Heatmap for ν=1e-3
-    ax = axes[2]
-    r = results["ν=1e-3"]
-    im = ax.imshow(r['dom_re'], cmap='viridis', origin='lower',
-                   extent=[0, r['dom_re'].shape[1]-1, 0, r['dom_re'].shape[0]-1])
-    plt.colorbar(im, ax=ax, label='Re(λ_dominant)')
-    ax.set_xlabel('k₂', fontsize=13)
-    ax.set_ylabel('k₁', fontsize=13)
-    ax.set_title('ν=1e-3: Mode Decay Rates', fontsize=14)
-
-    plt.tight_layout()
-    path = os.path.join(save_dir, 'fig_eigenspectrum_comparison.png')
-    plt.savefig(path, dpi=200, bbox_inches='tight')
-    plt.close()
-    print(f"  Saved: {path}")
-
-
-# ============================================================
-# SLEDGEHAMMER 3: OOD Viscosity Transfer
-# ============================================================
-
-@torch.no_grad()
-def analysis_ood_transfer(ckpt_koopman_1e3, ckpt_koopman_1e5, ckpt_fno_1e5,
-                          data_1e5, results_eig, device, save_dir, args):
-    print("\n" + "="*70)
-    print("SLEDGEHAMMER 3: OOD Viscosity Transfer")
-    print("  Train on ν=1e-3 → Test on ν=1e-5 (100× harder turbulence)")
-    print("="*70)
-
-    # Load ν=1e-5 test data
-    x_test, y_test, grid, H, W = load_data(data_1e5, T_in=10, T_out=10)
-    x_test, y_test = x_test.to(device), y_test.to(device)
-    grid = grid.to(device)
-    n_test = x_test.shape[0]
-    target = y_test.permute(0, 3, 1, 2)  # (B, T_out, H, W)
-
-    # --- Koopman trained on ν=1e-5 (in-distribution baseline) ---
-    model_1e5 = SpatialKoopmanLGN().to(device)
-    model_1e5.load_state_dict(torch.load(ckpt_koopman_1e5, map_location=device, weights_only=False))
-    model_1e5.eval()
-
-    preds_in_dist = []
-    for i in range(0, n_test, 20):
-        xb = x_test[i:i+20]; Bb = xb.shape[0]
-        g = grid.unsqueeze(0).expand(Bb, -1, -1, -1)
-        preds_in_dist.append(model_1e5(xb, g, 10).cpu())
-    pred_in_dist = torch.cat(preds_in_dist).to(device)
-    l2_in_dist, std_in_dist = paper_rel_l2(pred_in_dist, target)
-    print(f"  Koopman ν=1e-5 (in-distribution):  {l2_in_dist:.4f} ± {std_in_dist:.4f}")
-
-    # --- Koopman trained on ν=1e-3, NO rescaling (naive transfer) ---
-    model_1e3 = SpatialKoopmanLGN().to(device)
-    model_1e3.load_state_dict(torch.load(ckpt_koopman_1e3, map_location=device, weights_only=False))
-    model_1e3.eval()
-
-    preds_naive = []
-    for i in range(0, n_test, 20):
-        xb = x_test[i:i+20]; Bb = xb.shape[0]
-        g = grid.unsqueeze(0).expand(Bb, -1, -1, -1)
-        preds_naive.append(model_1e3(xb, g, 10).cpu())
-    pred_naive = torch.cat(preds_naive).to(device)
-    l2_naive, std_naive = paper_rel_l2(pred_naive, target)
-    print(f"  Koopman ν=1e-3 → ν=1e-5 (naive):  {l2_naive:.4f} ± {std_naive:.4f}")
-
-    # --- Koopman trained on ν=1e-3, WITH D_k rescaling ---
-    # Try multiple scale factors around the theoretical ratio
-    alpha_1e3 = F.softplus(model_1e3.alpha).mean().item()
-    alpha_1e5 = F.softplus(model_1e5.alpha).mean().item()
-    theoretical_scale = alpha_1e5 / alpha_1e3
-    print(f"  Theoretical scale factor (alpha ratio): {theoretical_scale:.6f}")
-
-    # Sweep scale factors: theoretical, 0.01 (exact ν ratio), and nearby
-    scale_factors = sorted(set([
-        theoretical_scale,
-        0.01,             # exact ν ratio
-        0.005, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0,
-    ]))
-
-    best_scale = None
-    best_l2 = float('inf')
-    sweep_results = []
-
-    for sf in scale_factors:
-        L_rescaled = model_1e3.get_generators_rescaled(sf)
-        preds_ood = []
-        for i in range(0, n_test, 20):
-            xb = x_test[i:i+20]; Bb = xb.shape[0]
-            g = grid.unsqueeze(0).expand(Bb, -1, -1, -1)
-            preds_ood.append(model_1e3(xb, g, 10, L_override=L_rescaled).cpu())
-        pred_ood = torch.cat(preds_ood).to(device)
-        l2_ood, std_ood = paper_rel_l2(pred_ood, target)
-        sweep_results.append((sf, l2_ood, std_ood))
-
-        if l2_ood < best_l2:
-            best_l2 = l2_ood
-            best_scale = sf
-            best_pred = pred_ood
-
-        tag = " <-- BEST" if l2_ood <= best_l2 else ""
-        tag += " (ν ratio)" if abs(sf - 0.01) < 1e-6 else ""
-        tag += " (α ratio)" if abs(sf - theoretical_scale) < 1e-6 else ""
-        print(f"    scale={sf:.4f}  L2={l2_ood:.4f} ± {std_ood:.4f}{tag}")
-
-    # --- FNO trained on ν=1e-5 (in-distribution, for context) ---
-    fno = FNO2d().to(device)
-    fno.load_state_dict(torch.load(ckpt_fno_1e5, map_location=device, weights_only=False))
-    fno.eval()
-
-    preds_fno = []
-    for i in range(0, n_test, 20):
-        xb = x_test[i:i+20]; Bb = xb.shape[0]
-        g = grid.unsqueeze(0).expand(Bb, -1, -1, -1)
-        preds_fno.append(fno.rollout(xb, g, 10).cpu())
-    pred_fno = torch.cat(preds_fno).to(device)
-    l2_fno, std_fno = paper_rel_l2(pred_fno, target)
-    print(f"  FNO ν=1e-5 (in-distribution):      {l2_fno:.4f} ± {std_fno:.4f}")
-
-    # --- Summary ---
-    print(f"\n  {'='*55}")
-    print(f"  OOD TRANSFER SUMMARY (test on ν=1e-5)")
-    print(f"  {'='*55}")
-    print(f"  {'Method':<45} {'Rel L2':>8}")
-    print(f"  {'-'*55}")
-    print(f"  {'FNO trained on ν=1e-5':<45} {l2_fno:>8.4f}")
-    print(f"  {'Koopman trained on ν=1e-5':<45} {l2_in_dist:>8.4f}")
-    print(f"  {'Koopman ν=1e-3 → ν=1e-5 (no rescaling)':<45} {l2_naive:>8.4f}")
-    print(f"  {'Koopman ν=1e-3 → ν=1e-5 (best rescaling)':<45} {best_l2:>8.4f}")
-    print(f"  {'  └─ scale factor':<45} {best_scale:>8.4f}")
-    print(f"  {'-'*55}")
-
-    # --- Figure ---
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-
-    # Panel A: Scale factor sweep
-    ax = axes[0]
-    sfs = [r[0] for r in sweep_results]
-    l2s = [r[1] for r in sweep_results]
-    ax.semilogx(sfs, l2s, 'o-', color='#2196F3', linewidth=2, markersize=8)
-    ax.axhline(y=l2_in_dist, color='green', linestyle='--', linewidth=1.5,
-               label=f'Koopman in-dist ({l2_in_dist:.3f})')
-    ax.axhline(y=l2_fno, color='orange', linestyle='--', linewidth=1.5,
-               label=f'FNO in-dist ({l2_fno:.3f})')
-    ax.axhline(y=l2_naive, color='red', linestyle=':', linewidth=1.5,
-               label=f'Naive transfer ({l2_naive:.3f})')
-    ax.axvline(x=0.01, color='gray', linestyle=':', alpha=0.5, label='ν ratio = 0.01')
-    ax.set_xlabel('D_k scale factor', fontsize=13)
-    ax.set_ylabel('Relative L2', fontsize=13)
-    ax.set_title('OOD Transfer: ν=1e-3 → ν=1e-5', fontsize=14)
-    ax.legend(fontsize=9)
-
-    # Panel B: Sample prediction comparison (first test sample, last timestep)
-    sample_idx = 0
-    t_show = -1  # last timestep
-    ax = axes[1]
-    gt = target[sample_idx, t_show].cpu().numpy()
-    ax.imshow(gt, cmap='RdBu_r')
-    ax.set_title('Ground Truth (ν=1e-5, t=T)', fontsize=13)
-    ax.axis('off')
-
-    ax = axes[2]
-    ood = best_pred[sample_idx, t_show].cpu().numpy()
-    ax.imshow(ood, cmap='RdBu_r')
-    ax.set_title(f'OOD Transfer (scale={best_scale:.3f})', fontsize=13)
-    ax.axis('off')
-
-    plt.tight_layout()
-    path = os.path.join(save_dir, 'fig_ood_transfer.png')
-    plt.savefig(path, dpi=200, bbox_inches='tight')
-    plt.close()
-    print(f"  Saved: {path}")
-
-    return {
-        'l2_in_dist': l2_in_dist, 'l2_naive': l2_naive,
-        'l2_best_ood': best_l2, 'best_scale': best_scale,
-        'l2_fno': l2_fno, 'sweep': sweep_results,
-    }
-
-
-# ============================================================
-# SLEDGEHAMMER 4: Long-Horizon Rollout (Error vs Time)
+# Long-horizon rollout: per-step error (Fig. 5a) and decoded enstrophy (Fig. 5b)
 # ============================================================
 
 @torch.no_grad()
 def analysis_long_horizon(ckpt_koopman_1e5, ckpt_fno_1e5, data_1e5,
                           device, save_dir, args):
     print("\n" + "="*70)
-    print("SLEDGEHAMMER 4: Long-Horizon Rollout — Error vs Time")
+    print("Long-horizon rollout: error vs time")
     print("  Koopman: single expm(L·t), no autoregression")
     print("  FNO: step-by-step autoregression, error compounds")
     print("="*70)
@@ -702,7 +359,7 @@ def analysis_long_horizon(ckpt_koopman_1e5, ckpt_fno_1e5, data_1e5,
     f_stds  = [x[1] for x in fno_per_step]
 
     ax.errorbar(steps, k_means, yerr=k_stds, fmt='o-', color='#2196F3',
-                linewidth=2, capsize=3, label='Koopman-LGN (single expm)')
+                linewidth=2, capsize=3, label='LGN-KM (single expm)')
     ax.errorbar(steps, f_means, yerr=f_stds, fmt='s-', color='#FF5722',
                 linewidth=2, capsize=3, label='FNO-2D (autoregressive)')
     ax.set_xlabel('Rollout Step t', fontsize=13)
@@ -718,7 +375,7 @@ def analysis_long_horizon(ckpt_koopman_1e5, ckpt_fno_1e5, data_1e5,
     k_energy = k_mean_energy.mean(dim=0).cpu().numpy()
     f_energy = f_mean_energy.mean(dim=0).cpu().numpy()
     ax.semilogy(t_ext, k_energy, color='#2196F3', linewidth=2,
-                label='Koopman-LGN', alpha=0.8)
+                label='LGN-KM', alpha=0.8)
     ax.semilogy(t_ext, f_energy, color='#FF5722', linewidth=2,
                 label='FNO-2D', alpha=0.8)
     ax.set_xlabel('Rollout Step t', fontsize=13)
@@ -739,56 +396,18 @@ def analysis_long_horizon(ckpt_koopman_1e5, ckpt_fno_1e5, data_1e5,
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_1e5', required=True, help='NavierStokes_V1e-5_N1200_T20.mat')
-    parser.add_argument('--data_1e3', default=None,  help='ns_V1e-3_N5000_T50.mat (optional)')
+    parser.add_argument('--data_1e5', required=True, help='data/ns/NavierStokes_V1e-5_N1200_T20.mat')
     parser.add_argument('--ckpt_koopman_1e5', required=True)
-    parser.add_argument('--ckpt_koopman_1e3', required=True)
     parser.add_argument('--ckpt_fno_1e5',     required=True)
-    parser.add_argument('--save_dir', default='./figures')
+    parser.add_argument('--save_dir', default='outputs/fig5ab')
     args = parser.parse_args()
 
     os.makedirs(args.save_dir, exist_ok=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Device: {device}")
-
-    # ---- SLEDGEHAMMER 1 & 2: Eigenspectrum ----
-    eig_results = analysis_viscosity_recovery(
-        args.ckpt_koopman_1e5, args.ckpt_koopman_1e3, device)
-    analysis_eigenspectrum_figure(eig_results, args.save_dir)
-
-    # ---- SLEDGEHAMMER 3: OOD Transfer ----
-    ood_results = analysis_ood_transfer(
-        args.ckpt_koopman_1e3, args.ckpt_koopman_1e5, args.ckpt_fno_1e5,
-        args.data_1e5, eig_results, device, args.save_dir, args)
-
-    # ---- SLEDGEHAMMER 4: Long-Horizon ----
     analysis_long_horizon(
         args.ckpt_koopman_1e5, args.ckpt_fno_1e5, args.data_1e5,
         device, args.save_dir, args)
-
-    # ---- FINAL SUMMARY ----
-    print("\n" + "="*70)
-    print("COMPLETE RESULTS — for paper text")
-    print("="*70)
-    print(f"""
-Accuracy (paper metric, raw data):
-    FNO-2D  ν=1e-5: 0.1575  |  Koopman-LGN: 0.2397  |  Params: 466K vs 599K
-
-Eigenspectrum (UNIQUE to Koopman-LGN):
-    ν=1e-5  R² = {eig_results['ν=1e-5']['r2']:.4f}
-    ν=1e-3  R² = {eig_results['ν=1e-3']['r2']:.4f}
-    α(1e-5)/α(1e-3) = {eig_results['ν=1e-5']['alpha_mean']/eig_results['ν=1e-3']['alpha_mean']:.4f}  (expect 0.01)
-
-OOD Transfer (IMPOSSIBLE for FNO):
-    Naive (no rescaling):  {ood_results['l2_naive']:.4f}
-    Best rescaling:        {ood_results['l2_best_ood']:.4f}  (scale={ood_results['best_scale']:.4f})
-    In-distribution:       {ood_results['l2_in_dist']:.4f}
-    
-    OOD closes {(1 - ood_results['l2_best_ood']/ood_results['l2_naive'])*100:.0f}% of the gap
-    between naive transfer and in-distribution training.
-
-All figures saved to: {args.save_dir}/
-""")
 
 
 if __name__ == '__main__':

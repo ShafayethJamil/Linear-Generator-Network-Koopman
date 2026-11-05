@@ -1,26 +1,15 @@
-"""
-E3 — LONG-HORIZON ACCURACY EVALUATION (suVX W4/Q3, pbkH W2)
-============================================================
-Rolls LGN-KM, FNO (and optionally LRAN) on the fresh long-horizon truth
-(generate_ns_long.py) from the same 10-frame input window, out to t=200.
+"""Evaluate LGN-KM, FNO, LRAN and KNO on the long-horizon truth, out to t = 200.
 
-Metrics written per step t = 11..200:
-  - per-sample relative L2 (pointwise accuracy; meaningful up to the
-    chaotic predictability horizon, saturates ~O(1) after — for ANY model)
-  - total enstrophy  mean(w^2)  of prediction vs truth (statistical accuracy)
-  - max |w| (blowup tracking)
-At t in {20, 50, 100, 200}: radial energy-spectrum relative error.
-Summary: first blowup step per model (max|w| > 1e3 or NaN).
+Paper: Section 4.1 and Appendix A.9, Table A.6.
 
-Usage (from the repository root; Table A.6 of the paper):
-  python long_horizon/eval_long_horizon.py \
-      --data outputs/long_horizon/ns_long_nu1e5_N200_T200_fixed.mat \
-      --koopman_ckpt checkpoints/ns/lgnkm_nu1e5_s0.pt --fno_ckpt checkpoints/ns/fno_nu1e5.pt \
-      --lran_ckpt checkpoints/baselines/lran_nu1e5_s0.pt --kno_ckpt checkpoints/baselines/kno_nu1e5_s0.pt \
-      --save_dir outputs/long_horizon/results/long
-Shipped output of that run: long_horizon/results/long/E3_*.csv
+Usage:
+    python long_horizon/eval_long_horizon.py --data outputs/long_horizon/ns_long_nu1e5_N200_T200_fixed.mat \
+        --koopman_ckpt checkpoints/ns/lgnkm_nu1e5_s0.pt --fno_ckpt checkpoints/ns/fno_nu1e5.pt \
+        --lran_ckpt checkpoints/baselines/lran_nu1e5_s0.pt --kno_ckpt checkpoints/baselines/kno_nu1e5_s0.pt
 
-Outputs (./checkpoints): E3_per_step.csv, E3_spectrum.csv, E3_summary.csv
+Every model gets the same 10-frame input. Writes per_step.csv (relative L2, enstrophy, max|w|
+for t = 11..200), spectrum.csv and summary.csv (first blow-up, max|w| > 1e3) to --save_dir.
+The paper's output is in long_horizon/results/long/. KNO needs koopmanlab.
 """
 
 import torch
@@ -318,7 +307,7 @@ def main(args):
     os.makedirs(args.save_dir, exist_ok=True)
 
     # ---- per-step metrics ----
-    per_step_path = os.path.join(args.save_dir, 'E3_per_step.csv')
+    per_step_path = os.path.join(args.save_dir, 'per_step.csv')
     names = list(preds.keys())
     with open(per_step_path, 'w', newline='') as f:
         w = csv.writer(f)
@@ -345,7 +334,7 @@ def main(args):
     print(f"wrote {per_step_path}")
 
     # ---- spectrum errors at checkpoints ----
-    spec_path = os.path.join(args.save_dir, 'E3_spectrum.csv')
+    spec_path = os.path.join(args.save_dir, 'spectrum.csv')
     checks = [t for t in [20, 50, 100, 200] if t <= T]
     with open(spec_path, 'w', newline='') as f:
         w = csv.writer(f)
@@ -365,7 +354,7 @@ def main(args):
     print(f"wrote {spec_path}")
 
     # ---- summary ----
-    summ_path = os.path.join(args.save_dir, 'E3_summary.csv')
+    summ_path = os.path.join(args.save_dir, 'summary.csv')
     with open(summ_path, 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(['model', 'first_blowup_t (max|w|>1e3)', 'rel_l2_t20', 'rel_l2_final'])
@@ -391,6 +380,6 @@ if __name__ == '__main__':
     p.add_argument('--kno_ckpt',     default=None,
                    help='trained koopmanlab KNO checkpoint (best_kno_*.pt from baselines/kno.py)')
     p.add_argument('--batch',        type=int, default=5)
-    p.add_argument('--save_dir',     default='./checkpoints')
+    p.add_argument('--save_dir',     default='outputs/long_horizon/results/long')
     args = p.parse_args()
     main(args)

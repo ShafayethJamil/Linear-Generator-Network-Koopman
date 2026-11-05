@@ -1,44 +1,16 @@
-"""
-E1 — FLEXIBLE-D EXPERIMENT (rebuttal, suVX W1/Q1)
-==================================================
-Same encoder/decoder/data/optimizer/metric as LGN-KM (koopman_nu1e5_raw.py).
-Only the D_k parameterization changes. S stays skew-symmetric, D stays
-positive (softplus) -> stability guarantee is PRESERVED in both variants.
-The question is whether the |k|^2 FORM emerges when it is not imposed.
+"""Train LGN-KM with a relaxed dissipation form: a learnable exponent p or a free diagonal.
 
-Variants (--Dparam):
-  freeexp : D_k = d0 + a0 * |k|^p          p a LEARNABLE scalar, init 1.0
-            (E1a — one extra parameter; if p -> 2, that is the headline number)
-  free    : D_k = softplus(B),  B free (modes,modes,r) tensor
-            (E1b — NO functional form at all; suVX's literal "broader
-             function class". Exponent recovered post-hoc by log-log fit)
-  paper   : D_k = d0 + a0 * |k|^2          (original, for control runs)
+Paper: Section 3.2, Fig. 3a, Appendix A.6, Table A.3 (checkpoints/dissipation/).
 
-Paper (Section 3.2, Appendix A.6, Table A.3, Fig. 3a): the script that trained
-the released checkpoints in checkpoints/dissipation/. Seeds 0/1/2 (tags without
-suffix / _s1 / _s2). ν=1e-5 uses T_out=10 (default); ν=1e-3 MUST use --T_out 40,
-the paper protocol. Two ν=1e-3 runs launched with the default T_out=10 ended at
-p ≈ 1.21; their logs are kept in results/ (A.6, horizon dependence).
-Checkpoint = lowest test L2 over 500 epochs (no validation split).
+Usage:
+    python navier_stokes/dissipation/lgn_flexD.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --Dparam freeexp --tag flexD_freeexp_nu1e5 --seed 0 --save_dir outputs/dissipation
+    python navier_stokes/dissipation/lgn_flexD.py --data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40 --Dparam freeexp --tag flexD_freeexp_nu1e3 --seed 0 --save_dir outputs/dissipation
+        (--Dparam free for the free diagonal; seeds 0, 1, 2 with tags <tag>, <tag>_s1, <tag>_s2;
+         add --analyze to write the eigenspectrum and exponent fit of a trained model)
 
-Usage (train, from the repo root):
-  python navier_stokes/dissipation/lgn_flexD.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat \
-      --Dparam freeexp --tag flexD_freeexp_nu1e5 --seed 0 --save_dir checkpoints/dissipation
-  python navier_stokes/dissipation/lgn_flexD.py --data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40 \
-      --Dparam free --tag flexD_free_nu1e3_s1 --seed 1 --save_dir checkpoints/dissipation
-
-Usage (post-hoc analysis, after training):
-  python navier_stokes/dissipation/lgn_flexD.py --data <same .mat> --Dparam free \
-      --tag flexD_free_nu1e5 --save_dir checkpoints/dissipation --analyze
-  The A.6 free-diagonal statistics (rank correlation, window-dependent exponent)
-  are computed by navier_stokes/dissipation/free_diagonal_fits.py.
-    -> writes eigenspectrum_<tag>.csv  (re, im, k2  for every mode/eig)
-       and    flexD_summary_<tag>.csv (fitted exponent p_hat, R2_powerlaw,
-                                       R2_quadratic, max Re, %stable, [p if freeexp])
-
-Training log (curve_koopman_<tag>.csv) gains a `p` column (freeexp: learned p
-per epoch; free: NaN) so the convergence of the exponent can be PLOTTED for
-the rebuttal figure.
+--Dparam freeexp: D_k = d0 + a0 |k|^p with p learnable (init 1); free: D_k = softplus(B_k), no form in k;
+paper: D_k = d0 + a0 |k|^2. S stays skew and D_k positive, so every eigenvalue has Re <= 0.
+nu = 1e-3 uses --T_out 40 (with the default T_out 10, p ends near 1.2).
 """
 
 import torch
@@ -281,7 +253,7 @@ def load_data(mat_path, T_in=10, T_out=10, n_train=1000, n_test=200, target_res=
 
 
 # ============================================================
-# POST-HOC ANALYSIS — the rebuttal numbers
+# POST-HOC ANALYSIS
 #   For every (k1,k2): eigvals of L_k; dominant (max-Re) eigenvalue.
 #   Power-law fit:  log(-Re_dom) = p_hat * log|k| + c   (shells k>0)
 #   Quadratic fit:  -Re_dom = a*|k|^2 + b               (R2 reported)
@@ -487,7 +459,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/dissipation')
     args = parser.parse_args()
     set_seed(args.seed)
     train(args)

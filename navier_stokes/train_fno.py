@@ -1,16 +1,12 @@
-"""
-FNO-2D baseline (Appendix A.1) — NO NORMALIZATION, paper-correct metric
-=============================================================
-Data: NavierStokes_V1e-5_N1200_T20.mat (scipy v5) with --T_out 10, or
-      ns_V1e-3_N5000_T50.mat (HDF5 v7.3) with --T_out 40.
-T_in=10, n_train=1000, n_test=200. Autoregressive rollout in training and test.
+"""Train the FNO-2D baseline on 2D Navier-Stokes.
 
-Metric: per-sample relative L2 over full (T_out*H*W) volume on RAW data
-    = exact Li et al. 2020 convention
+Paper: Table 1, Fig. 5, Appendix A.1 (checkpoints/ns/fno_nu1e{5,3}.pt).
 
 Usage:
-    python navier_stokes/train_fno.py --data NavierStokes_V1e-5_N1200_T20.mat --T_out 10 --tag nu1e5_raw
-    python navier_stokes/train_fno.py --data ns_V1e-3_N5000_T50.mat --T_out 40 --tag nu1e3_raw
+    python navier_stokes/train_fno.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --T_out 10 --tag nu1e5
+    python navier_stokes/train_fno.py --data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40 --tag nu1e3
+
+Autoregressive rollout in training and test; test L2 is evaluated every 10 epochs.
 """
 
 import torch
@@ -249,6 +245,6 @@ if __name__ == '__main__':
     parser.add_argument('--width',    type=int,   default=20)
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=20)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/fno')
     args = parser.parse_args()
     train(args)

@@ -1,19 +1,17 @@
-"""
-2D FitzHugh-Nagumo with no-flux (Neumann) BCs (Appendix A.7)
-=============================================================
-Same physics, parameters, protocol and output format as generate_fhn_periodic.py.
-Only change: homogeneous Neumann boundaries on [0, 2pi]^2, solved
-pseudo-spectrally in the cosine basis (DCT-II diagonalizes the Laplacian under
-Neumann BCs), RK4 in time. Cosine wavenumbers k_m = pi m / L. Initial
-conditions are sums of cos(m pi x/L) cos(n pi y/L) (zero normal derivative).
+"""Generate 2D FitzHugh-Nagumo data with no-flux (Neumann) boundaries.
 
-Paper datasets (seed 42, 1200 trajectories, 64 x 64, 31 frames):
+Paper: Appendix A.7, Table A.4 (data).
+
+Usage (seed 42, 1200 trajectories, 64 x 64, 31 frames):
     python fitzhugh_nagumo/generate_fhn_neumann.py --Du 0.01  --out data/fhn/rd_neumann_Du0.01_N1200_T30.mat
     python fitzhugh_nagumo/generate_fhn_neumann.py --Du 0.001 --out data/fhn/rd_neumann_Du0.001_N1200_T30.mat
+
+Same equations and parameters as generate_fhn_periodic.py, solved pseudo-spectrally in the
+cosine (DCT-II) basis, which satisfies the no-flux condition exactly; RK4 in time.
 """
 
 import numpy as np
-import argparse
+import argparse, os
 from timeit import default_timer
 from scipy.fft import dctn, idctn
 
@@ -104,7 +102,7 @@ class FHNNeumannSolver:
         compared with the largest centred-difference gradient in the interior.
         A no-flux field gives a ratio of O(h^2); a field that violates the
         boundary condition gives O(1). Returns (max |du/dn| at walls, ratio)."""
-        # fix: the original multiplied by 0.0 and always returned 0 (no-op check)
+        # fixed: this check used to multiply by 0.0 and always return 0
         h = self.L / self.res
         one_sided = lambda a, b, c: np.abs(-2.0 * a + 3.0 * b - c) / h
         wall = max(one_sided(u[0], u[1], u[2]).max(), one_sided(u[-1], u[-2], u[-3]).max(),
@@ -154,6 +152,7 @@ def main(args):
           f"mean {data.mean():.4f} std {data.std():.4f}")
 
     import h5py
+    os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     with h5py.File(args.out, 'w') as f:
         f.create_dataset('u', data=data, compression='gzip')
     print(f"Saved to {args.out}")
@@ -172,6 +171,6 @@ if __name__ == '__main__':
     parser.add_argument('--a',          type=float, default=0.7)
     parser.add_argument('--b',          type=float, default=0.8)
     parser.add_argument('--seed',       type=int,   default=42)
-    parser.add_argument('--out',        default='rd_neumann_N1200_T30.mat')
+    parser.add_argument('--out',        default='data/fhn/rd_neumann_Du0.01_N1200_T30.mat')
     args = parser.parse_args()
     main(args)

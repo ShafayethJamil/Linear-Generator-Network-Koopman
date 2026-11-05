@@ -1,31 +1,12 @@
-"""
-Koopman-LGN for NLSE — 1D Fiber Optics Diagnostics
-=====================================================
-Adapted from Spatial Koopman-LGN (2D Navier-Stokes).
+"""Train LGN-KM on optical-fiber NLSE propagation (1D lift, complex field).
 
-Changes from NS version:
-    - SpectralConv2d → SpectralConv1d  (1D FFT over pulse time axis)
-    - Encoder/Decoder: Conv2d → Conv1d
-    - Grid: 2D (x,y) → 1D (t)
-    - k2_norm: 2D modes → 1D modes
-    - rfft2/irfft2 → rfft/irfft
-    - Data loader for NLSE .mat files
+Paper: Section 3.3, Fig. 4, Appendix A.8 (checkpoints/nlse/b2_{10..30}_s{0,1,2}.pt).
 
-UNCHANGED (the diagnostic core):
-    - S = (P - Pᵀ)/2  (skew-symmetric, inter-frequency coupling / FWM)
-    - D_k = diag(d₀ + α|ω|²/ω²_max)  (frequency-dependent loss)
-    - L_k = S - D_k   (generator per frequency mode)
-    - Propagation via expm(L_k · z)
-    - All eigenvalue/cascade diagnostics identical
+Usage:
+    python nlse/train_nlse.py --data data/nlse/nlse_b2_20_soliton.mat --field complex --tag b2_20_s1 --seed 1 --save_dir outputs/nlse
+        (one run per fiber |beta2| = 10, 15, 20, 25, 30 and seed 0, 1, 2)
 
-What the paper reads from this model (Section 3.3, Appendix A.8): the rotation
-rates of S (its eigenfrequencies) and the routing of each optical frequency onto
-them; |beta2| = 13.56 x (fastest rotation rate). See nlse/readout.py.
-
-Paper models (complex field, final-epoch checkpoint; a run ledger is appended to
-nlse/runs/ledger.jsonl):
-    python nlse/train_nlse.py --data data/nlse/nlse_b2_20_soliton.mat \
-        --field complex --tag b2_20_s1 --seed 1 --save_dir checkpoints/nlse
+Saves the best and the final-epoch checkpoint (the paper uses the final epoch) and appends a run record to nlse/runs/ledger.jsonl.
 """
 
 import torch
@@ -56,7 +37,7 @@ import numpy as np
 import argparse, os, csv
 from timeit import default_timer
 
-# seeds are set in train() from --seed (ladder project edit)
+# seeds are set in train() from --seed
 
 
 # ============================================================
@@ -590,7 +571,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=20)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints_nlse')
+    parser.add_argument('--save_dir', default='outputs/nlse')
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--extract_only', action='store_true',
                         help='Skip training, just extract diagnostics from checkpoint')

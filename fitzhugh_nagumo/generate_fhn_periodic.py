@@ -1,17 +1,13 @@
-"""
-2D FitzHugh-Nagumo reaction-diffusion data, periodic BCs (Appendix A.4)
-========================================================================
-Pseudo-spectral solver on [0, 2pi]^2 with RK4 time integration (dt = 0.01,
-2/3 dealiasing of u^3). Only the activator u is stored (N, H, W, T+1); the
-inhibitor v is hidden from the model.
+"""Generate 2D FitzHugh-Nagumo reaction-diffusion data with periodic boundaries.
 
-    du/dt = D_u lap(u) + u - u^3/3 - v
-    dv/dt = D_v lap(v) + eps (u + a - b v)
+Paper: Appendix A.4, Fig. A.2 (data).
 
-Paper datasets (D_v = 0.005, eps = 0.01, a = 0.7, b = 0.8, seed 42, 1200
-trajectories, 64 x 64, 30 saved steps of 0.1 -> 31 frames, ~0.5 GB each):
+Usage (seed 42, 1200 trajectories, 64 x 64, 31 frames, ~0.5 GB each):
     python fitzhugh_nagumo/generate_fhn_periodic.py --Du 0.01  --out data/fhn/rd_Du0.01_N1200_T30.mat
     python fitzhugh_nagumo/generate_fhn_periodic.py --Du 0.001 --out data/fhn/rd_Du0.001_N1200_T30.mat
+
+    du/dt = D_u lap(u) + u - u^3/3 - v,    dv/dt = D_v lap(v) + eps (u + a - b v)
+Pseudo-spectral on [0, 2pi]^2, RK4 (dt = 0.01). Only the activator u is stored; v is hidden.
 """
 
 import numpy as np
@@ -184,6 +180,7 @@ def main(args):
     print(f"  u std:   {data.std():.4f}")
 
     import h5py
+    os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     with h5py.File(args.out, 'w') as f:
         f.create_dataset('u', data=data, compression='gzip')
 
@@ -204,6 +201,6 @@ if __name__ == '__main__':
     parser.add_argument('--b',         type=float, default=0.8)
     parser.add_argument('--amplitude', type=float, default=0.3)
     parser.add_argument('--seed',      type=int,   default=42)
-    parser.add_argument('--out',       default='rd_N1200_T30.mat')
+    parser.add_argument('--out',       default='data/fhn/rd_Du0.01_N1200_T30.mat')
     args = parser.parse_args()
     main(args)

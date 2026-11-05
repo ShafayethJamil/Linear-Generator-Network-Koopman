@@ -1,61 +1,49 @@
 {
  "baselines/lran_nu1e5_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_dmd_lran/best_koopman_lran_nu1e5_s0.pt",
   "sha256": "fd9e56165e399ca62886432b7d54db066142100fce2f0afe3fda8454eb705b40",
   "selection": "lowest test L2 over 500 epochs (no validation split)"
  },
  "baselines/kno_nu1e5_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_kno/best_kno_kno_nu1e5_s0.pt",
   "sha256": "524acc46a4f8979294a19759659b43742defd7bf2fc44d210d88fbfc344229b6",
   "selection": "lowest test L2 over 500 epochs (no validation split); koopmanlab 1.0.3"
  },
  "baselines/lran_nu1e5_s1.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_dmd_lran/best_koopman_lran_nu1e5_s1.pt",
   "sha256": "cf3fa3f8a2b82f590d2412be0dc63775279fc9d02186274fcf910f373bb12f78",
   "selection": "lowest test L2 over 500 epochs (no validation split)"
  },
  "baselines/kno_nu1e5_s1.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_kno/best_kno_kno_nu1e5_s1.pt",
   "sha256": "c8310735df264ea2b097f1403a76efddbd417b7f82ebe4c6fe60ffa9adfeb02f",
   "selection": "lowest test L2 over 500 epochs (no validation split); koopmanlab 1.0.3"
  },
  "baselines/lran_nu1e5_s2.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_dmd_lran/best_koopman_lran_nu1e5_s2.pt",
   "sha256": "fb0dc874fc650db124fd0a7a2217f61783619dbdb4327b8abeefb7d79b865ac1",
   "selection": "lowest test L2 over 500 epochs (no validation split)"
  },
  "baselines/kno_nu1e5_s2.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_kno/best_kno_kno_nu1e5_s2.pt",
   "sha256": "3ac5078ce91d294c8f037fb45702ef7fea207e3a2cd334ed3d9091666a90278e",
   "selection": "lowest test L2 over 500 epochs (no validation split); koopmanlab 1.0.3"
  },
  "baselines/lran_nu1e3_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_dmd_lran/best_koopman_lran_nu1e3_s0.pt",
   "sha256": "83d68cc521cc6ab14237d7c4b81d566fe8df7fcbf640faee8cd955cfeff24835",
   "selection": "lowest test L2 over 500 epochs (no validation split)"
  },
  "baselines/kno_nu1e3_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_kno/best_kno_kno_nu1e3_s0.pt",
   "sha256": "e60f8784c352b498dff5ae52e4bc394d55ed0f5f6a1a09ff1a7d19aa372196eb",
   "selection": "lowest test L2 over 500 epochs (no validation split); koopmanlab 1.0.3"
  },
  "baselines/lran_nu1e3_s1.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_dmd_lran/best_koopman_lran_nu1e3_s1.pt",
   "sha256": "a48100394d8e4361de3e0baa87f070de47dbbf19bc1b44449a92c29ea78194b5",
   "selection": "lowest test L2 over 500 epochs (no validation split)"
  },
  "baselines/kno_nu1e3_s1.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_kno/best_kno_kno_nu1e3_s1.pt",
   "sha256": "0e7546ad770ab07b93bf702a294c311344e0ae4ab5977f3fde8aa0569436b03a",
   "selection": "lowest test L2 over 500 epochs (no validation split); koopmanlab 1.0.3"
  },
  "baselines/lran_nu1e3_s2.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_dmd_lran/best_koopman_lran_nu1e3_s2.pt",
   "sha256": "af14bf6ff9797a584e49baab8b2f74744a61358781e3b8e4942e90e511dd6108",
   "selection": "lowest test L2 over 500 epochs (no validation split)"
  },
  "baselines/kno_nu1e3_s2.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_kno/best_kno_kno_nu1e3_s2.pt",
   "sha256": "df912cf2d5eea508cdfecf19b6344050e5ef08a3897b02cdd64dfa5173308744",
   "selection": "lowest test L2 over 500 epochs (no validation split); koopmanlab 1.0.3"
  }

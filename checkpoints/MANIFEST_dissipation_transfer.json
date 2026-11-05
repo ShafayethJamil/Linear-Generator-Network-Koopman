@@ -1,136 +1,109 @@
 {
  "dissipation/best_koopman_flexD_freeexp_nu1e5.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_freeexp_nu1e5.pt",
   "sha256": "c5f7e843d3152388c8446362e49a1ed23427ab2a96cc321b5af2f9a0c5c36fc6",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=10"
  },
  "dissipation/best_koopman_flexD_freeexp_nu1e5_s1.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_freeexp_nu1e5_s1.pt",
   "sha256": "37ed6be433ca139a1a7e1d1b7c7e23d598fb7a37640947e0bf6814ccb5730045",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=10"
  },
  "dissipation/best_koopman_flexD_freeexp_nu1e5_s2.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_freeexp_nu1e5_s2.pt",
   "sha256": "764c48ba93432283da67f8e9b8f0ae6fb7c83846a0cd0ced5cf1c6020adc1f20",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=10"
  },
  "dissipation/best_koopman_flexD_freeexp_nu1e3.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_freeexp_nu1e3.pt",
   "sha256": "ef03e7a9d84af31997028624a2fc8cecc11d46c39dea84042b2c3983e1b8ea6a",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=40"
  },
  "dissipation/best_koopman_flexD_freeexp_nu1e3_s1.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_freeexp_nu1e3_s1.pt",
   "sha256": "3a1bc8786370248e5b3b156e8864d73bb20060a84f32975a0d156259786d14f8",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=40"
  },
  "dissipation/best_koopman_flexD_freeexp_nu1e3_s2.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_freeexp_nu1e3_s2.pt",
   "sha256": "08fc5415429147ca17be5f5a4bc57013c30bae079d0671656a3ae18c1facd0d2",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=40"
  },
  "dissipation/best_koopman_flexD_free_nu1e5.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_free_nu1e5.pt",
   "sha256": "dfa33fa6fc336bef351b50b98a7d3d50cfa507a12ef7bf313fe30114cc3bd3f0",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=10"
  },
  "dissipation/best_koopman_flexD_free_nu1e5_s1.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_free_nu1e5_s1.pt",
   "sha256": "2615d62f7895923993489558b3f5cd34216b706cae857aedf693311dab8a6251",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=10"
  },
  "dissipation/best_koopman_flexD_free_nu1e5_s2.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_free_nu1e5_s2.pt",
   "sha256": "b3b8d3a18c514566460c570798774eec26c9851a021539e48b154cd3b87f668c",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=10"
  },
  "dissipation/best_koopman_flexD_free_nu1e3.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_free_nu1e3.pt",
   "sha256": "3dc640b085d08db82483c021202926c60af68b60970554bdc7f3d1fb63d07a7b",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=40"
  },
  "dissipation/best_koopman_flexD_free_nu1e3_s1.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_free_nu1e3_s1.pt",
   "sha256": "c7e342284f4ba7abf07ac3eff169b50b793979e7b6b528be8c87a40408086359",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=40"
  },
  "dissipation/best_koopman_flexD_free_nu1e3_s2.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/Exp_extract/best_koopman_flexD_free_nu1e3_s2.pt",
   "sha256": "cc4d924fd78278a9ad929e92e1759f29fbfcc23aad12c8b8a84bf35a2d497646",
   "selection": "lowest test L2 over 500 epochs (no validation split); T_out=40"
  },
  "transfer/best_scratch_N50_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_scratch_N50_s0.pt",
   "sha256": "29f8247e73d908fefeea96e5171b3398e44f06b84f28fdb1c31d3ee32e6a319c",
   "selection": "lowest test L2 over 500 epochs (no validation split); lr 1e-3, random init"
  },
  "transfer/best_scratch_N100_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_scratch_N100_s0.pt",
   "sha256": "3f662a2fffac0f1ea5601cc2403ecc9f08aa7ac0bde7bd6545367169393ba0d2",
   "selection": "lowest test L2 over 500 epochs (no validation split); lr 1e-3, random init"
  },
  "transfer/best_scratch_N200_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_scratch_N200_s0.pt",
   "sha256": "a60e2d9cabf79590a657a0e28fc4f74da22d9dde479efe473d4193d6582a9324",
   "selection": "lowest test L2 over 500 epochs (no validation split); lr 1e-3, random init"
  },
  "transfer/best_scratch_N500_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_scratch_N500_s0.pt",
   "sha256": "973938c902986faf4f1878e50740743e70b2713b14d92ddca3b59763ad97ee92",
   "selection": "lowest test L2 over 500 epochs (no validation split); lr 1e-3, random init"
  },
  "transfer/best_scratch_N1000_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_scratch_N1000_s0.pt",
   "sha256": "f50668d4cf78fa7f0de6e0d7630d5d469dcf7342cc2996e1d18117b76ec868f5",
   "selection": "lowest test L2 over 500 epochs (no validation split); lr 1e-3, random init"
  },
  "transfer/best_transfer_all_N50_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_all_N50_s0.pt",
   "sha256": "10056273d73117ebcba231e1d41ca07b3ec43f8db881fa0aad11582c711809d0",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_all_N100_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_all_N100_s0.pt",
   "sha256": "c9668e966f724620ffb3311cc4083032a862daed0c60006049f52b2f82f255ed",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_all_N200_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_all_N200_s0.pt",
   "sha256": "413599ef64562b65b387f797feff9883b0a4b1af92d8350343665987960dd8dc",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_all_N500_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_all_N500_s0.pt",
   "sha256": "ad4358794f8a6b5abb65f7eabe675c5f26cc7111f1fb4e313066cfc7ed9f0cee",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_all_N1000_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_all_N1000_s0.pt",
   "sha256": "c9f996bdbdf1bd2d8fee7eff32259fa01be01e5b4927fd4606c201199c038ce5",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_freezeS_N50_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_freezeS_N50_s0.pt",
   "sha256": "d2b01fa773adf45a936090f5a55f615db88b5fbc2c4f71f3fd86f907a1ee98b8",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_freezeS_N100_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_freezeS_N100_s0.pt",
   "sha256": "b3b5386ce58af0f858fdc573b403f8ce011edeaf7af7bef720edad806cf1ee9f",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_freezeS_N200_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_freezeS_N200_s0.pt",
   "sha256": "8682af18a04e5a35057973ea6d422cfed2a25741225f4adf89a955bbc997ea74",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_freezeS_N500_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_freezeS_N500_s0.pt",
   "sha256": "fc2b646f1ad738946a664c33abc1912ac97ce10253b225c6f18db72ab1bb1bf6",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  },
  "transfer/best_transfer_freezeS_N1000_s0.pt": {
-  "source": "/home/shafayeth/LGN_koopman/Unnormalized/viscosity_transfer/transfer_results/best_transfer_freezeS_N1000_s0.pt",
   "sha256": "380b22eced9f5b22ac9cc40e5b595b34980765d0071ab7046c06ac32f54ee191",
   "selection": "lowest test L2 over 500 epochs (no validation split); fine-tuned at lr 3e-4 from checkpoints/ns/lgnkm_nu1e5_s0.pt"
  }

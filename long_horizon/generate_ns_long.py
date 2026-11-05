@@ -1,31 +1,13 @@
-"""
-E3 — LONG-HORIZON NS GROUND TRUTH (nu=1e-5, t=0..200)
-======================================================
-Fresh 2D Navier-Stokes trajectories generated with the SAME setup as the
-original FNO dataset (Li et al. 2020, public data-generation code):
+"""Generate long-horizon 2D Navier-Stokes ground truth (nu = 1e-5, t = 1..200).
 
-  - vorticity formulation on [0,1]^2, periodic
-  - forcing f(x,y) = 0.1*( sin(2*pi*(x+y)) + cos(2*pi*(x+y)) )
-  - initial vorticity ~ GRF: alpha=2.5, tau=7 (sigma = tau^1.5)
-  - pseudo-spectral, 2/3-rule dealiasing; time integration differs from the
-    reference (Crank-Nicolson + explicit nonlinear, delta_t = 1e-4): here
-    integrating-factor RK4 with CFL-adaptive step, dt <= 1e-3 (see
-    navier_stokes_2d)
-  - solved at 256^2, subsampled (::4) to 64^2, recorded every 1.0 time unit
+Paper: Appendix A.9, Table A.6 (data); run through long_horizon/run_pipeline.sh.
 
-Output: HDF5 'u' with shape (N, 64, 64, T) — frames at t = 1..T (matches the
-original dataset's convention). Evaluation protocol downstream: frames 1..10
-are the model input window, frames 11..T are ground truth (T-10 steps).
+Usage (the paper's 200 trajectories are 4 x 50, seeds 1234-1237):
+    python long_horizon/generate_ns_long.py --N 50 --T 200 --seed 1234 --out outputs/long_horizon/parts/long_s1234.mat
 
-Fresh ICs (not continuations of existing test trajectories) so the truth is
-full-resolution and unimpeachable — no sub-grid information is missing.
-
-Usage (from the repository root; the paper's 200 trajectories are 4 x 50,
-seeds 1234-1237, concatenated and energy-gated by long_horizon/run_pipeline.sh):
-  python -u long_horizon/generate_ns_long.py --N 50 --T 200 --seed 1234 \
-      --out outputs/long_horizon/parts/long_s1234.mat
-
-Runtime: ~2-4 h for N=50, T=200 on one modern GPU (2e6 solver steps, batched).
+Same forcing and Gaussian-random-field initial conditions as the Li et al. benchmark, solved
+at 256^2 with integrating-factor RK4 (CFL-adaptive, dt <= 1e-3) and subsampled to 64^2.
+Output: HDF5 'u' of shape (N, 64, 64, T), frames at t = 1..T, plus the time vector 't'.
 """
 
 import torch
@@ -59,9 +41,8 @@ class GaussianRF:
         self.sqrt_eig = sqrt_eig.to(device)
 
     def sample(self, N):
-        # Li et al. convention: real and imaginary parts each N(0,1), complex
-        # variance 2. (randn(dtype=cfloat) has variance 1 and gave ICs at half
-        # the benchmark enstrophy; fixed 2026-11-03, see camera_ready_rerun/.)
+        # Li et al. convention: real and imaginary parts each N(0,1) (complex
+        # variance 2); a variance-1 complex draw gives half the benchmark energy.
         coeff = torch.view_as_complex(
             torch.randn(N, self.size, self.size, 2, device=self.device))
         coeff = self.sqrt_eig * coeff
@@ -189,6 +170,7 @@ def main(args):
           f"mean {data.mean():.4f} std {data.std():.4f}")
 
     import h5py
+    os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     with h5py.File(args.out, 'w') as fo:
         fo.create_dataset('u', data=data, compression='gzip')
         fo.create_dataset('t', data=np.arange(1, args.T + 1, dtype=np.float32))
@@ -208,7 +190,7 @@ if __name__ == '__main__':
                    help='safety factor on the RK4 advective stability limit')
     p.add_argument('--batch',    type=int,   default=50,
                    help='trajectories solved simultaneously (memory permitting)')
-    p.add_argument('--out',      default='ns_long_nu1e5_N50_T200.mat')
+    p.add_argument('--out',      default='outputs/long_horizon/ns_long_nu1e5_N50_T200.mat')
     p.add_argument('--seed',     type=int,   default=1234)
     args = p.parse_args()
     main(args)

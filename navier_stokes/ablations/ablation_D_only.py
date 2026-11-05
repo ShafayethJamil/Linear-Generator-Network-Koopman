@@ -1,25 +1,9 @@
-"""
-Release: the "D-only (S=0)" column of Table A.2 and Fig. A.3(c) (Appendix A.5).
-    python navier_stokes/ablations/ablation_D_only.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --save_dir runs/ablations
-Released checkpoint: checkpoints/ns_ablations/structural/Donly.pt (lowest test L2 over 500 epochs).
+"""Structural ablation: dissipative generator only, L_k = -D_k (no coupling).
 
-Original docstring:
-ABLATION: D-only (S=0) — Diagonal dissipation only
-====================================================
-Same encoder/decoder/data/optimizer as LGN-KM, but the generator is
-L_k = -D_k = -diag(softplus(d) + softplus(alpha) * |k|^2 / k_max^2)
-
-No inter-channel coupling. No off-diagonal elements. No oscillatory modes.
-All eigenvalues are real and negative (purely dissipative).
-
-This tests whether the coupling matrix S is necessary for spectral richness.
-Expected: no dispersion branches (eigenvalues are real), no imaginary parts,
-Kolmogorov scaling may partially survive via D's |k|^2 structure, but
-there are no coherent multi-branch dynamics.
+Paper: Appendix A.5, Table A.2, Fig. A.3(c) (checkpoints/ns_ablations/structural/Donly.pt).
 
 Usage:
-    CUDA_VISIBLE_DEVICES=2 python ablation_D_only.py \
-        --data NavierStokes_V1e-5_N1200_T20.mat --tag ablation_Donly_nu1e5
+    python navier_stokes/ablations/ablation_D_only.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --save_dir outputs/ablations
 """
 
 import torch
@@ -328,6 +312,6 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/ablations')
     args = parser.parse_args()
     train(args)

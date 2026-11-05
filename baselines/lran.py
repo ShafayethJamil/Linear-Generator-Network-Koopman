@@ -1,31 +1,14 @@
-"""
-E2c — LINEARLY-RECURRENT AUTOENCODER BASELINE (suVX ref [2], Otto & Rowley)
-============================================================================
-Same encoder/decoder/data/optimizer/metric as LGN-KM (koopman_nu1e5_raw.py).
-The ONLY change: the latent dynamics are an UNCONSTRAINED discrete-time
-linear operator  z_{t+1} = A z_t  (single r x r matrix, shared across
-Fourier modes, no S-D structure, no k-dependence, no stability constraint,
-no matrix exponential). This is the core mechanism of the linearly-recurrent
-autoencoder family: learn a lift in which the dynamics are linear, with the
-linear operator fully free.
+"""Linearly recurrent autoencoder (LRAN) baseline: the LGN-KM encoder and decoder with an
+unconstrained discrete-time latent operator z_{t+1} = A z_t.
 
-Purpose in the rebuttal table:
-  - forecast accuracy: does removing structure help or hurt?
-  - generator quality: eigenvalues of A -> % stable (|mu| <= 1), max |mu|,
-    and NO physical decomposition / no dispersion readout. This row is the
-    empirical version of the gauge argument: an unconstrained learned-linear
-    model can forecast, but its generator is not readable.
+Paper: Table 1 (LRAN row: test relative L2, spectral radius of A) and the LRAN rows of Table A.6.
 
-Usage:
-  CUDA_VISIBLE_DEVICES=0 python baselines/lran.py --data NavierStokes_V1e-5_N1200_T20.mat --tag lran_nu1e5
-  # after training:
-  python baselines/lran.py --data <same> --tag lran_nu1e5 --analyze
+Usage (seeds 0, 1, 2):
+    python baselines/lran.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --tag lran_nu1e5_s0 --seed 0
+    python baselines/lran.py --data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40 --tag lran_nu1e3_s0 --seed 0
+    python baselines/lran.py --data <same> --tag <same> --analyze      # eigenvalues of A
 
-Repository usage (from the root; Table 1, A.9). Seeds 0-2; nu=1e-3 uses
---data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40:
-  python baselines/lran.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat \
-      --tag lran_nu1e5_s0 --seed 0 --save_dir outputs/baselines
-Shipped outputs: baselines/results/; checkpoints: checkpoints/baselines/.
+Encoder, decoder, data, optimizer and metric are identical to navier_stokes/train_lgnkm.py.
 """
 
 import torch
@@ -148,7 +131,7 @@ def paper_rel_l2_loss(pred, target):
 def eval_per_step(model, x_test, y_test, grid, T_out, batch):
     """Rel-L2 over the full volume AND resolved per rollout step t=1..T_out,
     on the test set. Mirrors the DMD/KNO baselines so all three are directly
-    comparable in the rebuttal table and the long-horizon plot."""
+    comparable in Table 1 and the long-horizon evaluation."""
     model.eval()
     n_test = x_test.shape[0]
     steps = [[] for _ in range(T_out)]
@@ -355,7 +338,7 @@ def train(args):
     print(f"\n{'='*60}")
     print(f"DONE [LRAN {args.tag}]  best test_l2 = {best_test_l2:.4f}")
     print(f"{'='*60}")
-    print(f"Now: python baselines/lran.py --data {args.data} --tag {args.tag} --analyze")
+    print(f"Next: python baselines/lran.py --data {args.data} --tag {args.tag} --save_dir {args.save_dir} --analyze")
 
 
 if __name__ == '__main__':
@@ -375,7 +358,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/baselines')
     args = parser.parse_args()
     set_seed(args.seed)
     train(args)

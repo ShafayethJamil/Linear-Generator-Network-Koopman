@@ -1,13 +1,13 @@
-"""
-Gate check for the regenerated long-horizon / fine-dt NS truth (camera-ready, 2026-11-03).
+"""Print the initial-condition energy of Navier-Stokes truth files relative to the benchmark.
 
-Prints mean omega^2 at the first integer-time frame (t = 1) for each file, with the
-standard error over trajectories, and the ratio to the Li et al. benchmark test split
-(NavierStokes_V1e-5_N1200_T20.mat, trajectories 1000:1200, frame index 0).
+Paper: Appendix A.9 (initial enstrophy 0.95 / 0.96 of the benchmark test split).
 
-Usage: python long_horizon/check_ic_energy.py FILE[:frame_index] [FILE[:frame_index] ...]
-  frame_index = index of t = 1 in that file (0 for 1-per-unit files, 3 for the
-  0.25-spaced fine-dt files whose frames start at t = 0.25).
+Usage:
+    python long_horizon/check_ic_energy.py FILE[:frame_index] [FILE[:frame_index] ...]
+
+Reports mean omega^2 at t = 1 with its standard error, and the ratio to the benchmark test
+split (trajectories 1000:1200). frame_index is the index of t = 1: 0 for the long-horizon
+files, 3 for the 0.25-spaced files. Benchmark path: $LGNKM_BENCH (default data/ns/...).
 """
 import os
 import sys

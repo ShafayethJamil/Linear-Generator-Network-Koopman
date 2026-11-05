@@ -1,15 +1,13 @@
-"""
-LGN-KM on 2D FitzHugh-Nagumo, periodic BCs (Appendix A.4, Fig. A.2)
-=====================================================================
-The architecture, loss and optimizer of the Navier-Stokes models, unchanged
-(this is the original koopman_swe.py, reused for the reaction-diffusion data).
-T_in = 10, T_out = 20, n_train = 1000, n_test = 200, no normalization; the
-checkpoint with the lowest test L2 over 500 epochs is saved (no validation split).
-Seed: torch.manual_seed(0) at import, for both diffusivities.
+"""Train LGN-KM on 2D FitzHugh-Nagumo with periodic boundaries.
 
-Usage (paper models):
+Paper: Appendix A.4, Fig. A.2.
+
+Usage:
     python fitzhugh_nagumo/train_fhn_periodic.py --data data/fhn/rd_Du0.01_N1200_T30.mat  --tag rd_Du0.01_r32
     python fitzhugh_nagumo/train_fhn_periodic.py --data data/fhn/rd_Du0.001_N1200_T30.mat --tag rd_Du0.001_r32
+
+Same architecture, loss and optimizer as the Navier-Stokes models; T_in = 10, T_out = 20,
+first 1000 trajectories train, next 200 test. The checkpoint with the lowest test L2 is saved.
 """
 
 import torch
@@ -292,7 +290,7 @@ def train(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--data',     required=True)
-    parser.add_argument('--tag',      default='swe')
+    parser.add_argument('--tag',      default='fhn_periodic')
     parser.add_argument('--T_in',     type=int,   default=10)
     parser.add_argument('--T_out',    type=int,   default=20)
     parser.add_argument('--n_train',  type=int,   default=1000)
@@ -303,6 +301,6 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/fhn_periodic')
     args = parser.parse_args()
     train(args)

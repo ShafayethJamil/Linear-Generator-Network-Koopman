@@ -1,32 +1,12 @@
-"""
-Release: produced the channel-dimension sweep of Appendix A.2 (Fig. A.1). The r = 32 runs are the
-canonical models (checkpoints/ns/lgnkm_nu1e{5,3}_s0.pt), not re-run inside the sweep.
-    python navier_stokes/ablations/ablation_r.py --data_1e5 data/ns/NavierStokes_V1e-5_N1200_T20.mat \
-        --data_1e3 data/ns/ns_V1e-3_N5000_T50.mat --r_values 4 8 16 64 --save_dir runs/r_sweep
-Released checkpoints and logs: checkpoints/ns_ablations/r_sweep/r{r}_{1e5,1e3}/ (best.pt, results.json, curve.csv).
+"""Channel-dimension sweep: train LGN-KM at several latent dimensions r for both viscosities.
 
-Original docstring:
-Channel Dimension Ablation: r = {4, 8, 16, 32, 64}
-=====================================================
-Trains LGN-KM at each r for both viscosities, logs:
-  - Test L2 vs epoch (convergence curves)
-  - Best test L2 per r
-  - Eigenspectrum R² per r (does Kolmogorov scaling emerge?)
-  - Parameter count per r
-  - 100% stability check per r
+Paper: Appendix A.2, Fig. A.1 (checkpoints/ns_ablations/r_sweep/).
 
-Usage (run each on a separate GPU):
-    CUDA_VISIBLE_DEVICES=0 python ablation_r.py --data_1e5 NavierStokes_V1e-5_N1200_T20.mat --viscosity 1e5
-    CUDA_VISIBLE_DEVICES=1 python ablation_r.py --data_1e3 ns_V1e-3_N5000_T50.mat --viscosity 1e3
+Usage:
+    python navier_stokes/ablations/ablation_r.py --data_1e5 data/ns/NavierStokes_V1e-5_N1200_T20.mat --data_1e3 data/ns/ns_V1e-3_N5000_T50.mat --r_values 4 8 16 64 --save_dir outputs/r_sweep
+    python navier_stokes/ablations/ablation_r.py --plot_only --save_dir outputs/r_sweep
 
-Or run all sequentially on one GPU:
-    CUDA_VISIBLE_DEVICES=0 python ablation_r.py \
-        --data_1e5 NavierStokes_V1e-5_N1200_T20.mat \
-        --data_1e3 ns_V1e-3_N5000_T50.mat \
-        --viscosity both
-
-After all runs complete, generate the figure:
-    python ablation_r.py --plot_only --save_dir ./ablation_results
+r = 32 is the main model (navier_stokes/train_lgnkm.py) and is not retrained here.
 """
 
 import torch
@@ -48,7 +28,7 @@ np.random.seed(0)
 R_VALUES = [4, 8, 16, 32, 64]
 
 # ============================================================
-# Model (identical to koopman_nu1e5_raw.py / koopman_nu1e3_raw.py)
+# Model (identical to navier_stokes/train_lgnkm.py)
 # ============================================================
 
 class SpectralConv2d(nn.Module):
@@ -491,7 +471,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_1e3',  default=None, help='Path to ν=1e-3 data')
     parser.add_argument('--viscosity', default='both', choices=['1e5', '1e3', 'both'])
     parser.add_argument('--epochs',    type=int, default=500)
-    parser.add_argument('--save_dir',  default='./ablation_results')
+    parser.add_argument('--save_dir',  default='outputs/r_sweep')
     parser.add_argument('--plot_only', action='store_true')
     parser.add_argument('--r_values',  nargs='+', type=int, default=None,
                         help='Override r values (e.g. --r_values 4 8 16)')

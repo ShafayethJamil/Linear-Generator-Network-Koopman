@@ -1,25 +1,13 @@
-"""
-LGN-KM (Linear Generator Network - Koopman) on 2D Navier-Stokes
-=========================================================================
-The script that trained the paper's Navier-Stokes models (Sections 3.1-3.2).
+"""Train LGN-KM on 2D Navier-Stokes (Li et al. benchmark).
 
-Data (Li et al. benchmark, see data/README.md):
-  nu=1e-5: NavierStokes_V1e-5_N1200_T20.mat  (scipy v5, shape (1200,64,64,20)), T_out=10
-  nu=1e-3: ns_V1e-3_N5000_T50.mat            (HDF5 v7.3, (T,H,W,N) -> permuted), T_out=40
-T_in=10, n_train=1000 (first 1000 trajectories), n_test=200 (next 200). No normalization.
-
-Metric: per-sample relative L2 over full (T_out*H*W) volume on RAW data.
-The checkpoint with the lowest test L2 over training is saved (no validation
-split is used; for these runs best and final epoch differ by < 0.0003).
+Paper: Sections 3.1-3.2, Fig. 2-3, Table 1 (checkpoints/ns/lgnkm_nu1e{5,3}_s{0,1,2}.pt).
 
 Usage:
-    python navier_stokes/train_lgnkm.py --data NavierStokes_V1e-5_N1200_T20.mat \
-        --T_out 10 --seed 0 --tag nu1e5_s0
-    python navier_stokes/train_lgnkm.py --data ns_V1e-3_N5000_T50.mat \
-        --T_out 40 --seed 0 --tag nu1e3_s0
+    python navier_stokes/train_lgnkm.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --T_out 10 --seed 0 --tag nu1e5_s0
+    python navier_stokes/train_lgnkm.py --data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40 --seed 0 --tag nu1e3_s0
 
-The released seed-0 checkpoints were trained by the same code with
-torch.manual_seed(0) at import instead of set_all_seeds(); seeds 1-2 by this file.
+First 1000 trajectories train, next 200 test, no normalization; seeds 0, 1, 2.
+The checkpoint with the lowest test L2 is saved (no validation split).
 """
 
 import torch
@@ -328,6 +316,6 @@ if __name__ == '__main__':
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
     parser.add_argument('--seed',     type=int,   default=0)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/ns')
     args = parser.parse_args()
     train(args)

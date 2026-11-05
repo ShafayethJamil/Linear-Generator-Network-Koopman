@@ -1,40 +1,11 @@
-"""
-Release: originally LGN_koopman/koopman_spatial.py. It trained the "normalized input" row of Table A.8
-(Appendix A.10): z-scored inputs, a per-frame relative-L2 loss, 1000 epochs. This is NOT the paper's main
-protocol (navier_stokes/train_lgnkm.py: raw data, full-volume loss, 500 epochs). Command reconstructed
-from the released curve (1000 epochs) and the nu = 1e-5 data length (T = 20, so T_out = 10):
-    python navier_stokes/ablations/train_normalized_input.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat \
-        --T_in 10 --T_out 10 --epochs 1000 --tag nu1e5_spatial --save_dir runs/normalized
-Released checkpoint: checkpoints/ns_ablations/sensitivity/normalized_input.pt. The physical interpretation in
-the original note below (alpha proportional to nu, zero-shot transfer) is a design hypothesis, not a paper claim.
+"""Train LGN-KM on z-scored inputs with a per-frame loss (the normalized-input variant).
 
-Original docstring:
-Spatial Koopman-LGN for 2D Navier-Stokes
-==========================================
-Key fix over v1: latent state is spatial z(x,y) in R^(r,H,W)
-NOT a global vector. Full spatial structure preserved.
-
-Generator architecture (physically motivated):
-    For each Fourier mode k=(k1,k2):
-        L_k = S - D_k
-        S    = (P - P^T)/2          skew-symmetric, SHARED across modes
-                                     encodes inter-channel energy transfer
-        D_k  = diag(softplus(d) + softplus(alpha) * |k|^2 / kmax^2)
-                                     mode-dependent dissipation
-                                     alpha*|k|^2 ~ viscous decay rate nu*|k|^2
-
-Physical interpretation:
-    - S: nonlinear advection couples vorticity modes (energy cascade)
-    - D_k: viscous dissipation — higher modes decay faster
-    - alpha recoverable = proportional to nu (zero-shot viscosity transfer)
-
-Stability: Re(eigenvalues(L_k)) <= 0 for ALL k  GUARANTEED
-Inverse design: gradient flows through expm(L_k * t) exactly
+Paper: Appendix A.10, Table A.8, "normalized input" row (checkpoints/ns_ablations/sensitivity/normalized_input.pt).
 
 Usage:
-    CUDA_VISIBLE_DEVICES=0 python koopman_spatial.py \\
-        --data ns_V1e-3_N5000_T50.mat \\
-        --T_in 10 --T_out 40 --epochs 500 --tag nu1e3_spatial
+    python navier_stokes/ablations/train_normalized_input.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --T_in 10 --T_out 10 --epochs 1000 --tag nu1e5_normalized --save_dir outputs/normalized
+
+Differs from the main protocol (navier_stokes/train_lgnkm.py): normalized data, per-frame loss, 1000 epochs.
 """
 
 import torch
@@ -402,11 +373,6 @@ def train(args):
 
     print(f"\n{'='*55}")
     print(f"DONE [{args.tag}]  best test_l2 = {best_test_l2:.4f}")
-    print(f"Comparison:")
-    print(f"  FNO-2D (paper) nu=1e-3:  0.0128")
-    print(f"  FNO-2D (ours)  nu=1e-3:  0.0140")
-    print(f"  Koopman-LGN v1 nu=1e-5:  0.2509  (global pooling)")
-    print(f"  Koopman-LGN v2 [{args.tag}]: {best_test_l2:.4f}  (spatial)")
     print(f"{'='*55}")
 
 
@@ -419,13 +385,13 @@ if __name__ == '__main__':
     parser.add_argument('--n_train',  type=int,   default=1000)
     parser.add_argument('--n_test',   type=int,   default=200)
     parser.add_argument('--r',        type=int,   default=32,
-                        help='Latent channels (smaller than v1 — spatial so memory scales HxW)')
+                        help='Latent channels')
     parser.add_argument('--modes',    type=int,   default=12)
     parser.add_argument('--width',    type=int,   default=32)
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10,
                         help='Smaller batch — spatial latent uses more memory')
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/normalized')
     args = parser.parse_args()
     train(args)

@@ -1,14 +1,13 @@
-"""
-FHN cross-diffusivity comparison (Appendix A.4, Fig. A.2c)
-===========================================================
-Raw S cosine similarity, and R^2 on [0,1]-normalised profiles of the S singular
-values, sorted d and sorted alpha, with the D_u = 0.001 model as reference
-(the paper's Section 3.2 convention).
+"""Compare FitzHugh-Nagumo generators trained at two diffusivities.
+
+Paper: Appendix A.4, Fig. A.2c.
 
 Usage:
-    python fitzhugh_nagumo/analyze_fhn_universality.py \
-        --ckpt_Du1 checkpoints/fhn/periodic_Du0.01_s0.pt \
-        --ckpt_Du2 checkpoints/fhn/periodic_Du0.001_s0.pt --out_dir results/fhn_universality
+    python fitzhugh_nagumo/analyze_fhn_universality.py --ckpt_Du1 checkpoints/fhn/periodic_Du0.01_s0.pt \
+        --ckpt_Du2 checkpoints/fhn/periodic_Du0.001_s0.pt
+
+Reports the raw S cosine similarity and R^2 on [0,1]-normalised profiles of the S singular
+values, sorted d and sorted alpha, with the D_u = 0.001 model as the reference.
 """
 
 import torch
@@ -58,18 +57,18 @@ def main(args):
     S1, d01, a01, svd1 = extract(args.ckpt_Du1, 'Du=0.01')
     S2, d02, a02, svd2 = extract(args.ckpt_Du2, 'Du=0.001')
 
-    # --- Raw S cosine similarity (should be LOW = gauge freedom) ---
+    # --- Raw S cosine similarity ---
     cos_sim = (S1.flatten() @ S2.flatten()) / (S1.flatten().norm() * S2.flatten().norm() + 1e-8)
 
-    # --- SVD profile of S (should MATCH = universal coupling) ---
+    # --- Singular-value profile of S ---
     r2_svd = normalized_r2(svd1, svd2)
 
-    # --- Sorted d0 distribution (should MATCH = universal base damping) ---
+    # --- Sorted d0 distribution ---
     d01_sorted = d01.sort().values
     d02_sorted = d02.sort().values
     r2_d = normalized_r2(d01_sorted, d02_sorted)
 
-    # --- Sorted alpha distribution (should DIFFER = regime-specific) ---
+    # --- Sorted alpha distribution ---
     a01_sorted = a01.sort().values
     a02_sorted = a02.sort().values
     r2_alpha = normalized_r2(a01_sorted, a02_sorted)
@@ -77,36 +76,22 @@ def main(args):
     print(f"\n{'='*60}")
     print(f"RESULTS")
     print(f"{'='*60}")
-    print(f"  Raw S cosine similarity:       {cos_sim.item():.3f}  (low = gauge freedom)")
-    print(f"  S SVD profile match (R²):      {r2_svd:.3f}  (high = universal coupling)")
-    print(f"  Sorted d₀ match (R²):          {r2_d:.3f}  (high = universal base damping)")
-    print(f"  Sorted α match (R²):           {r2_alpha:.3f}  (low = regime-specific)")
-
-    # Compare with NS numbers from paper
-    print(f"\n  Comparison with NS (from paper):")
-    print(f"  {'Quantity':<30} {'NS':>10} {'FHN':>10}")
-    print(f"  {'-'*50}")
-    print(f"  {'S cosine similarity':<30} {'0.023':>10} {cos_sim.item():>10.3f}")
-    print(f"  {'S SVD profile R²':<30} {'0.941':>10} {r2_svd:>10.3f}")
-    print(f"  {'Sorted d₀ R²':<30} {'0.942':>10} {r2_d:>10.3f}")
-    print(f"  {'Sorted α R²':<30} {'0.415':>10} {r2_alpha:>10.3f}")
-
-    if r2_svd > 0.8 and r2_d > 0.8 and r2_alpha < r2_d:
-        print(f"\n  ✓ Same decomposition principle: S and d universal, α regime-specific")
-    else:
-        print(f"\n  Results require interpretation")
+    print(f"  Raw S cosine similarity:       {cos_sim.item():.3f}")
+    print(f"  S SVD profile match (R²):      {r2_svd:.3f}")
+    print(f"  Sorted d₀ match (R²):          {r2_d:.3f}")
+    print(f"  Sorted α match (R²):           {r2_alpha:.3f}")
 
     # Save CSV
     csv_path = os.path.join(args.out_dir, 'fhn_universality.csv')
     with open(csv_path, 'w', newline='') as f:
         w = csv.writer(f)
-        w.writerow(['metric', 'FHN_value', 'NS_value_from_paper'])
-        w.writerow(['S_cosine_similarity', f'{cos_sim.item():.4f}', '0.023'])
-        w.writerow(['S_SVD_profile_R2', f'{r2_svd:.4f}', '0.941'])
-        w.writerow(['sorted_d0_R2', f'{r2_d:.4f}', '0.942'])
-        w.writerow(['sorted_alpha_R2', f'{r2_alpha:.4f}', '0.415'])
+        w.writerow(['metric', 'value'])
+        w.writerow(['S_cosine_similarity', f'{cos_sim.item():.4f}'])
+        w.writerow(['S_SVD_profile_R2', f'{r2_svd:.4f}'])
+        w.writerow(['sorted_d0_R2', f'{r2_d:.4f}'])
+        w.writerow(['sorted_alpha_R2', f'{r2_alpha:.4f}'])
 
-    # Save sorted profiles for MATLAB plotting
+    # Save sorted profiles for plotting
     np.savetxt(os.path.join(args.out_dir, 'svd_Du0.01.csv'),
                svd1.numpy(), delimiter=',', fmt='%.8f')
     np.savetxt(os.path.join(args.out_dir, 'svd_Du0.001.csv'),
@@ -127,6 +112,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ckpt_Du1', required=True)
     parser.add_argument('--ckpt_Du2', required=True)
-    parser.add_argument('--out_dir', default='fhn_universality')
+    parser.add_argument('--out_dir', default='outputs/fhn_universality')
     args = parser.parse_args()
     main(args)

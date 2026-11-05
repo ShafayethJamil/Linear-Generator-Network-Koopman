@@ -1,19 +1,14 @@
-"""
-LGN-KM with a DCT-II (cosine) lift, no-flux FHN (Appendix A.7, Table A.4)
-==========================================================================
-Same S-D generator, encoder/decoder shape, protocol and metric as the periodic
-FHN runs. Only change: every rfft2/irfft2 is replaced by an orthonormal DCT-II,
-the basis that satisfies homogeneous Neumann BCs, so the whole model is real.
-D_k is indexed by cosine wavenumbers k_m = pi m / L.
+"""Train LGN-KM with a DCT-II (cosine) lift on no-flux FitzHugh-Nagumo.
 
-Usage (paper models: 2 diffusivities x seeds 0, 1, 2):
-    python fitzhugh_nagumo/train_fhn_neumann.py --data data/fhn/rd_neumann_Du0.01_N1200_T30.mat \
-        --tag fhn_dct_Du0.01_s0 --seed 0
-    python fitzhugh_nagumo/train_fhn_neumann.py --data <same .mat> --tag <same tag> --analyze
-        -> eigenspectrum_<tag>.csv and dct_summary_<tag>.csv (max Re, mean decay vs |k|^2)
-Note: the mean decay vs |k|^2 is linear by construction (tr S = 0, so the mean of
--Re(lambda) over a wavevector equals the mean of diag D_k); its R^2 = 1 is an
-identity, not a fit result.
+Paper: Appendix A.7, Table A.4.
+
+Usage (both diffusivities, seeds 0, 1, 2):
+    python fitzhugh_nagumo/train_fhn_neumann.py --data data/fhn/rd_neumann_Du0.01_N1200_T30.mat --tag fhn_dct_Du0.01_s0 --seed 0
+    python fitzhugh_nagumo/train_fhn_neumann.py --data <same> --tag <same> --analyze
+
+Same generator, protocol and metric as the periodic runs, with every FFT replaced by an
+orthonormal DCT-II, so the model is real-valued. --analyze writes the eigenspectrum and
+dct_summary_<tag>.csv (max Re, mean decay vs |k|^2; its linearity in |k|^2 holds by construction).
 """
 
 import torch
@@ -370,7 +365,7 @@ def train(args):
     print(f"\n{'='*60}")
     print(f"DONE [DCT-LGN {args.tag}]  best test_l2 = {best_test_l2:.4f}")
     print(f"{'='*60}")
-    print(f"Now: python fitzhugh_nagumo/train_fhn_neumann.py --data {args.data} --tag {args.tag} --analyze")
+    print(f"Next: python fitzhugh_nagumo/train_fhn_neumann.py --data {args.data} --tag {args.tag} --save_dir {args.save_dir} --analyze")
 
 
 if __name__ == '__main__':
@@ -389,7 +384,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/fhn_neumann')
     args = parser.parse_args()
     set_seed(args.seed)
     train(args)

@@ -1,22 +1,9 @@
-"""
-Release: the "S-only (D=0)" column of Table A.2 and Fig. A.3(b) (Appendix A.5).
-    python navier_stokes/ablations/ablation_S_only.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --save_dir runs/ablations
-Released checkpoint: checkpoints/ns_ablations/structural/Sonly.pt (lowest test L2 over 500 epochs).
+"""Structural ablation: conservative generator only, L_k = S for every k (no dissipation).
 
-Original docstring:
-ABLATION: S-only (D=0) — Conservative dynamics only
-=====================================================
-Same encoder/decoder/data/optimizer as LGN-KM, but the generator is
-L_k = S for all k. No dissipation mechanism. No k-dependence.
-
-This tests whether S alone captures the advective coupling structure.
-Expected: oscillatory structure preserved, but accuracy degrades because
-there is no mechanism for viscous damping. All eigenvalues are purely
-imaginary (Re=0 exactly), so energy is conserved in latent space.
+Paper: Appendix A.5, Table A.2, Fig. A.3(b) (checkpoints/ns_ablations/structural/Sonly.pt).
 
 Usage:
-    CUDA_VISIBLE_DEVICES=1 python ablation_S_only.py \
-        --data NavierStokes_V1e-5_N1200_T20.mat --tag ablation_Sonly_nu1e5
+    python navier_stokes/ablations/ablation_S_only.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --save_dir outputs/ablations
 """
 
 import torch
@@ -319,6 +306,6 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/ablations')
     args = parser.parse_args()
     train(args)

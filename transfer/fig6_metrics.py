@@ -1,21 +1,12 @@
-"""
-Fig. 6(b,c) and Table A.1 numbers from the transfer learning curves.
+"""Fig. 6(b,c) and Table A.1 numbers from the transfer learning curves.
 
-No script producing the Fig. 6(c) metrics survived from the original runs; this one
-implements the definitions that reproduce the plotted values:
+Paper: Section 4.2, Fig. 6, Appendix A.3, Table A.1.
 
-  best(cond, N)  = minimum test L2 over the 500 epochs of curve_<cond>_N<N>_s0.csv
-  speedup(N)     = (epoch of the scratch minimum)
-                   / (first epoch at which freeze-S test L2 <= the scratch minimum)
-                   (undefined when freeze-S never reaches the scratch minimum)
-  gain(N)        = (best(scratch) - best(freeze-S)) / best(scratch)
-  Delta(N)       = (best(freeze-S) - best(transfer-all)) / best(transfer-all),
-                   from unrounded errors (Table A.1)
+Usage:
+    python transfer/fig6_metrics.py --results_dir transfer/results [--out outputs/transfer/fig6_metrics.csv]
 
-All values are single-seed (seed 0).
-
-Usage (from the repo root):
-    python transfer/fig6_metrics.py --results_dir transfer/results [--out fig6_metrics.csv]
+speedup = epoch of the scratch minimum / first epoch at which freeze-S reaches it;
+gain = relative improvement of freeze-S over scratch; Delta = freeze-S vs transfer-all (Table A.1).
 """
 import argparse, csv, os
 

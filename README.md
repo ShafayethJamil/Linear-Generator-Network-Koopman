@@ -1,78 +1,100 @@
 # LGN-KM: Linear Generator Network–Koopman
 
-Code, checkpoints and a reproduction check for
+**Eigenvalues for nonlinear PDEs.** LGN-KM is a neural operator that learns the continuous-time *generator* of a nonlinear PDE's dynamics, in a structured form you can read directly. Decay rates, oscillation frequencies and dispersion relations come straight out of the trained weights, and stability is guaranteed by construction.
 
-> S. Jamil and R. Kapadia, *Linear Generator Networks for Nonlinear Partial Differential Equations*, NeurIPS 2026.
+> S. Jamil and R. Kapadia, *Linear Generator Networks for Nonlinear Partial Differential Equations*, **NeurIPS 2026**.
 
-LGN-KM lifts a nonlinear field into a latent space and learns the continuous-time Koopman generator at every retained Fourier mode as L_k = S − D_k. S is skew-symmetric and shared across modes; D_k is a positive diagonal with wavenumber-dependent damping. Every eigenvalue therefore has Re(λ) ≤ 0, the spectrum can be read directly from the parameters, and any time t is one matrix exponential.
+<p align="center"><img src="assets/architecture.png" width="85%"></p>
 
-## Quick start: check the paper's numbers
+## The idea in one paragraph
+
+Linear systems are transparent: their generator's eigenvalues tell you how every mode decays and oscillates. Nonlinear PDEs have no such generator, but the Koopman view says the dynamics become linear in the right lifted coordinates. LGN-KM learns that lift with a neural encoder. In the lifted space, at every Fourier mode k, it learns the generator in the form
+
+**L_k = S − D_k**
+
+- **S is skew-symmetric** and shared across modes. It is the conservative coupling, and it only rotates.
+- **D_k is a positive diagonal** that grows with |k|². It is mode-selective damping.
+
+So every eigenvalue has Re(λ) ≤ 0 by construction, the whole spectrum is legible from about 560 parameters, and the state at any time t is a single matrix exponential exp(L_k t). There is no step-by-step rollout.
+
+## What you get
+
+- **A spectrum for 2D turbulence.** On Navier–Stokes, the generator gives a complete multi-branch dispersion relation: 4,608 eigenvalues, all stable. Small scales decay faster, as viscosity demands. A learnable dissipation exponent, initialized at 1, rises to 2.2–2.4.
+- **Physics you can check against a known answer.** On optical-fiber pulse propagation (the nonlinear Schrödinger equation), the rotation rates of S trace the fiber's dispersion relation. The fastest one gives the group-velocity dispersion to within 3.1%, with **no fitted constant**: |β₂| = 2 f_max / (Ω₁₅² Δz).
+- **Structure shared across regimes.** Models trained independently at viscosities 100× apart learn the same singular-value profile of S (R² = 0.87).
+- **Stable, any-time prediction.**
+  - Rollouts stay bounded to t = 200, where FNO and LRAN diverge.
+  - Querying t = 200 costs 1.9 ms, against 299 ms for FNO's 200 autoregressive steps.
+  - Queries between training frames beat interpolating the model's own frames at every time.
+- **Transfer with little data.** Freezing S from the ν = 10⁻⁵ model and fine-tuning the rest at ν = 10⁻³ gives 18% lower error than training from scratch with 50 trajectories.
+- **Beyond Navier–Stokes.** The same architecture, unchanged, works on FitzHugh–Nagumo reaction–diffusion, including no-flux boundaries via a cosine lift.
+
+<p align="center">
+<img src="assets/ns_spectrum.png" width="31%">
+<img src="assets/nlse_routing.png" width="31%">
+<img src="assets/nlse_readout.png" width="31%">
+</p>
+<p align="center"><sub>Left: all 4,608 eigenvalues of the learned generator for 2D turbulence (ν = 10⁻⁵), coloured by |k|². Middle: each optical frequency's energy routed onto the rotation rates of S; dashed, the fiber's true phase advance. Right: |β₂| read from the generator vs the true value, for 15 models.</sub></p>
+
+## Try it in a minute
 
 ```bash
+git clone https://github.com/ShafayethJamil/Linear-Generator-Network-Koopman.git
+cd Linear-Generator-Network-Koopman
 pip install -r requirements.txt
-bash scripts/download_checkpoints.sh       # all checkpoints of the paper (~300 MB) into checkpoints/
-python verify.py                           # checkpoints and shipped result files only, CPU, a few seconds
-python verify.py --data_dir data/ns        # also re-evaluates test errors (GPU recommended)
+bash scripts/download_checkpoints.sh     # all trained models, ~285 MB
+python examples/read_generator.py        # no data needed
 ```
 
-`--data_dir` is one folder. It must hold the two benchmark files. Optionally it can also hold the generated `rd_neumann_Du*.mat` (Table A.4 test errors) and the two `ns_*_fixed.mat` long-horizon files (Tables A.6/A.7); checks whose files are missing are skipped.
+```
+Navier-Stokes nu=1e-5: 4608 eigenvalues, Re in [-1.76, -0.0211] (all stable), Im in +/-0.70
+Navier-Stokes nu=1e-3: 4608 eigenvalues, Re in [-0.38, -0.0444] (all stable), Im in +/-0.32
+Fiber with |beta2| = 10 ps^2/km: read from the generator 10.2 ps^2/km
+Fiber with |beta2| = 20 ps^2/km: read from the generator 18.8 ps^2/km
+Fiber with |beta2| = 30 ps^2/km: read from the generator 30.0 ps^2/km
+```
 
-`verify.py` recomputes each number in the paper from the checkpoints or the shipped result files. It compares each value with the number as printed and reports PASS or FAIL. Checks are strict: a number that does not round to the printed value is reported as FAIL and never loosened.
+The whole readout is in `examples/read_generator.py`: the generator lives in three tensors of the checkpoint (`P`, `d`, `alpha`).
 
-`checkpoints/MANIFEST*.json` records, for every checkpoint, the original file it came from, its SHA-256, and how it was selected.
-
-## Paper → code
-
-| Paper | Code | Checkpoints (`checkpoints/…`) | Data |
-|---|---|---|---|
-| §2–3.1, Fig. 2, main Navier–Stokes models | `navier_stokes/train_lgnkm.py`, `navier_stokes/extract_SD.py` | `ns/lgnkm_nu{1e5,1e3}_s{0,1,2}.pt` | NS benchmark |
-| §3.2, Fig. 3b–d, cross-viscosity statistics (3 seeds) | `verify.py` (`verify_ns`) | `ns/lgnkm_*` | — |
-| §3.2, Fig. 3a, Table A.3, learnable exponent p | `navier_stokes/dissipation/lgn_flexD.py --Dparam freeexp` | `dissipation/best_koopman_flexD_freeexp_*` | NS benchmark |
-| A.6, free diagonal and window-dependent exponent | `lgn_flexD.py --Dparam free`, `navier_stokes/dissipation/free_diagonal_fits.py` | `dissipation/best_koopman_flexD_free_*` | NS benchmark |
-| §3.3, Fig. 4, A.8, Table A.5, optical fiber (NLSE) | `nlse/datagen.py`, `nlse/train_nlse.py`, `nlse/readout.py` | `nlse/b2_{10..30}_s{0,1,2}.pt`, `nlse/b2_5_s0.pt` | generated (`nlse/datagen.py`) |
-| Table 1, FNO baseline | `navier_stokes/train_fno.py` | `ns/fno_nu{1e5,1e3}.pt` | NS benchmark |
-| Table 1, DMD, LRAN and KNO baselines | `baselines/{dmd,lran,kno}.py` (outputs in `baselines/results/`) | `baselines/{lran,kno}_nu{1e3,1e5}_s{0,1,2}.pt` (DMD is deterministic) | NS benchmark |
-| §4.1, Fig. 5a–b, per-step error and enstrophy over 200 steps | `long_horizon/fig5ab_rollout.py` | `ns/lgnkm_*_s0.pt`, `ns/fno_nu1e5.pt` | NS benchmark |
-| §4.1, Fig. 5c, wall time vs horizon | `continuous_time/continuous_time.py` | `ns/lgnkm_nu1e5_s0.pt`, `ns/fno_nu1e5.pt` | NS benchmark |
-| A.9, Table A.6, long-horizon accuracy | `long_horizon/run_pipeline.sh` (generate → energy gate → evaluate) | LGN-KM, FNO, `baselines/lran_nu1e5_s0.pt`, `baselines/kno_nu1e5_s0.pt` | regenerated, 200 trajectories |
-| A.9, Table A.7, unseen time resolution | `long_horizon/run_pipeline.sh`, `long_horizon/eval_fine_dt.py` | `ns/lgnkm_nu1e5_s0.pt` | regenerated, 200 trajectories |
-| §4.2, Fig. 6, A.3, Table A.1, cross-viscosity transfer | `transfer/transfer_experiment.py`, `transfer/fig6_metrics.py` | `transfer/best_{scratch,transfer_all,transfer_freezeS}_N*_s0.pt` | NS benchmark ν = 10⁻³ |
-| A.2, Fig. A.1, channel dimension r | `navier_stokes/ablations/ablation_r.py`, `ablation_r2_fix.py` | `ns_ablations/r_sweep/` | NS benchmark |
-| A.5, Table A.2, Fig. A.3, structural ablations | `navier_stokes/ablations/ablation_{unconstrained_L,S_only,D_only}.py` | `ns_ablations/structural/` | NS benchmark ν = 10⁻⁵ |
-| A.10, Table A.8, sensitivity to r, M and normalization | `navier_stokes/ablations/analyze_spectral.py`, `train_normalized_input.py` | `ns_ablations/sensitivity/`, `ns_ablations/r_sweep/` | NS benchmark ν = 10⁻⁵ |
-| A.4, Fig. A.2, FitzHugh–Nagumo, periodic | `fitzhugh_nagumo/{generate_fhn_periodic,train_fhn_periodic,analyze_fhn_spectrum,analyze_fhn_universality}.py` | `fhn/periodic_Du{0.01,0.001}_s0.pt` | generated |
-| A.7, Table A.4, FitzHugh–Nagumo, no-flux (DCT-II lift) | `fitzhugh_nagumo/{generate_fhn_neumann,train_fhn_neumann}.py` | `fhn/neumann_Du{0.01,0.001}_s{0,1,2}.pt` | generated |
-
-Each script's docstring gives the exact command that produced the paper's result.
-
-The scripts are the ones that produced the paper. Hard-coded paths became arguments, and three known bugs are fixed and commented in the code:
-- `continuous_time.py` compared step t with the wrong frame (an off-by-one); the timings it reports were not affected.
-- The no-flux check in `generate_fhn_neumann.py` was a no-op; it now measures the wall-normal derivative.
-- The long-horizon generators drew initial conditions at half the benchmark energy. They now use the Li et al. convention, and the pipeline refuses to evaluate unless the initial enstrophy is within 10% of the benchmark.
-
-## Data
-
-- **Navier–Stokes benchmark (Li et al.).** Download from the FNO authors' folder; see `data/README.md` for the link and SHA-256 checksums.
-- **Generated datasets.** NLSE, FitzHugh–Nagumo and long-horizon data come from the generators, with fixed seeds:
+## Train your own
 
 ```bash
-python nlse/datagen.py --regime soliton --beta2_list -10 -15 -20 -25 -30 --save_dir data/nlse
-python fitzhugh_nagumo/generate_fhn_periodic.py --Du 0.01 --out data/fhn/rd_Du0.01_N1200_T30.mat     # and --Du 0.001
-python fitzhugh_nagumo/generate_fhn_neumann.py  --Du 0.01 --out data/fhn/rd_neumann_Du0.01_N1200_T30.mat   # and --Du 0.001
-bash long_horizon/run_pipeline.sh          # ~2.2 h on 4 GPUs: 4 x 50 trajectories per file, energy gate, evaluation
+# 2D Navier-Stokes (Li et al. benchmark; download link in data/README.md), ~40 min on one GPU
+python navier_stokes/train_lgnkm.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --T_out 10 --tag nu1e5
+
+# optical fiber: generate pulses, train on the complex field, read beta2
+python nlse/datagen.py --regime soliton --beta2_list -20 --save_dir data/nlse
+python nlse/train_nlse.py --data data/nlse/nlse_b2_20_soliton.mat --field complex --tag b2_20 --save_dir outputs/nlse
+python nlse/readout.py --ckpt outputs/nlse/final_koopman_nlse_b2_20.pt --data data/nlse/nlse_b2_20_soliton.mat --beta2 -20
 ```
 
-## Protocol notes
+## Every experiment in the paper
 
-- **Split.** The first 1000 trajectories train and the next 200 test, with no normalization (except the one A.10 row that is labelled as normalized).
-- **No validation split.** Every reported test error is the minimum over training epochs. For converged runs this differs from the final epoch by less than 0.001. NLSE seeds 1–2 are final-epoch checkpoints recorded in a run ledger.
-- **Transfer runs.** Fine-tuning uses 0.3× the learning rate of training from scratch, and the transfer results are single-seed.
-- **Retraining.** A retrained model will not match the released checkpoints bit for bit (cuDNN is nondeterministic), but it should agree within the seed spread reported in the paper.
+Each script's docstring has the exact command for its paper result. The checkpoints are in the release and are fetched by `scripts/download_checkpoints.sh`.
+
+| Paper | Code | Checkpoints |
+|---|---|---|
+| §3.1–3.2, Figs 2–3, Navier–Stokes generator and cross-regime structure | `navier_stokes/train_lgnkm.py`, `extract_SD.py` | `ns/` |
+| §3.2, Table A.3, A.6, learnable exponent, free diagonal | `navier_stokes/dissipation/` | `dissipation/` |
+| §3.3, Fig 4, A.8, optical-fiber dispersion | `nlse/` | `nlse/` |
+| Table 1, FNO, DMD, LRAN and KNO baselines | `navier_stokes/train_fno.py`, `baselines/` | `ns/`, `baselines/` |
+| §4.1, Fig 5, long horizon and timing | `long_horizon/`, `continuous_time/` | `ns/`, `baselines/` |
+| A.9, long-horizon accuracy and unseen time resolution | `long_horizon/run_pipeline.sh` | `ns/`, `baselines/` |
+| §4.2, Fig 6, A.3, cross-viscosity transfer | `transfer/` | `transfer/` |
+| A.2, A.5, A.10, channel dimension, structural ablations, sensitivity | `navier_stokes/ablations/` | `ns_ablations/` |
+| A.4, A.7, FitzHugh–Nagumo, periodic and no-flux | `fitzhugh_nagumo/` | `fhn/` |
+
+Result tables from the paper's runs sit next to the code, in `baselines/results/`, `long_horizon/results/`, `transfer/results/` and `navier_stokes/dissipation/results/`.
 
 ## Citation
 
-See `CITATION.cff`.
+```bibtex
+@inproceedings{jamil2026lgnkm,
+  title     = {Linear Generator Networks for Nonlinear Partial Differential Equations},
+  author    = {Jamil, Shafayeth and Kapadia, Rehan},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2026}
+}
+```
 
-## License
-
-MIT, see `LICENSE`.
+MIT license.

@@ -1,5 +1,6 @@
 #!/bin/bash
-# Maintainer: build the release asset from checkpoints/ (upload it to the release named by TAG).
+# Build the checkpoint release asset from checkpoints/ (maintainers).
+# Usage: bash scripts/package_checkpoints.sh [TAG]   (default v1.1)
 set -e
 cd "$(dirname "$0")/.."
 TAG=${1:-v1.1}

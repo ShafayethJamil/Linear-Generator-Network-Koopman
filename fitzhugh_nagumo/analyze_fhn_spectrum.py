@@ -1,14 +1,13 @@
-"""
-Eigenspectrum of a trained FHN generator (Appendix A.4, Fig. A.2a-b)
-=====================================================================
-Writes the full eigenspectrum, the dominant (least-damped) eigenvalue per
-wavevector, and the R^2 of Re(lambda_dom) vs |k|^2 over all k > 0
-(pde_fingerprint_comparison.csv, column R2_Re_vs_k2). Output files keep the
-original script's 'swe' label.
+"""Eigenspectrum of a trained FitzHugh-Nagumo generator and the fit of Re(lambda_dom) vs |k|^2.
+
+Paper: Appendix A.4, Fig. A.2a-b.
 
 Usage:
-    python fitzhugh_nagumo/analyze_fhn_spectrum.py \
-        --ckpt_swe checkpoints/fhn/periodic_Du0.01_s0.pt --out_dir results/fhn_Du0.01
+    python fitzhugh_nagumo/analyze_fhn_spectrum.py --ckpt_fhn checkpoints/fhn/periodic_Du0.01_s0.pt --out_dir outputs/fhn_Du0.01
+    python fitzhugh_nagumo/analyze_fhn_spectrum.py --ckpt_fhn checkpoints/fhn/periodic_Du0.001_s0.pt --out_dir outputs/fhn_Du0.001
+
+Writes the full eigenspectrum, the dominant (least-damped) eigenvalue per wavevector and
+pde_fingerprint_comparison.csv (column R2_Re_vs_k2: R^2 over all k > 0).
 """
 
 import torch
@@ -125,9 +124,8 @@ def save_full_eigenspectrum(info, label, out_dir):
 
 def analyze_dispersion(info, label, out_dir):
     """
-    Check if Im(λ) scales with |k| (wave dispersion) vs |k|² (viscous).
-    For SWE: expect Im(λ) ~ |k|  (gravity waves)
-    For NS:  expect Re(λ) ~ |k|² (viscous dissipation)
+    Fit the dominant eigenvalue per wavevector: Im(λ) vs |k| and |k|², Re(λ) vs |k|².
+    Diffusive damping appears as Re(λ) ~ |k|².
     """
     S, d0, a0, k2_norm = info['S'], info['d0'], info['a0'], info['k2_norm']
     modes = info['modes']
@@ -204,13 +202,13 @@ def analyze_dispersion(info, label, out_dir):
 def main(args):
     os.makedirs(args.out_dir, exist_ok=True)
 
-    # Extract SWE
+    # Extract FHN
     print("=" * 60)
-    print("Extracting SWE generator...")
-    swe = extract_generator(args.ckpt_swe, 'swe')
-    save_eigenspectrum(swe, 'swe', args.out_dir)
-    save_full_eigenspectrum(swe, 'swe', args.out_dir)
-    disp_swe = analyze_dispersion(swe, 'swe', args.out_dir)
+    print("Extracting FHN generator...")
+    fhn = extract_generator(args.ckpt_fhn, 'fhn')
+    save_eigenspectrum(fhn, 'fhn', args.out_dir)
+    save_full_eigenspectrum(fhn, 'fhn', args.out_dir)
+    disp_fhn = analyze_dispersion(fhn, 'fhn', args.out_dir)
 
     # Extract NS (if provided)
     ns_results = {}
@@ -240,13 +238,13 @@ def main(args):
                      'R2_Im_vs_k', 'R2_Im_vs_k2', 'R2_Re_vs_k2',
                      'dominant_scaling'])
 
-        # SWE
-        dom = 'wave (Im~|k|)' if disp_swe['r2_im_vs_k'] > disp_swe['r2_re_vs_k2'] else 'dissipative (Re~|k|²)'
-        w.writerow(['SWE', f'{swe["S_norm"]:.4f}', f'{swe["D_norm_mean"]:.4f}',
-                     f'{swe["SD_ratio"]:.4f}',
-                     f'{disp_swe["r2_im_vs_k"]:.4f}', f'{disp_swe["r2_im_vs_k2"]:.4f}',
-                     f'{disp_swe["r2_re_vs_k2"]:.4f}', dom])
-        print(f"  SWE:       S/D = {swe['SD_ratio']:.3f}  |  {dom}")
+        # FHN
+        dom = 'wave (Im~|k|)' if disp_fhn['r2_im_vs_k'] > disp_fhn['r2_re_vs_k2'] else 'dissipative (Re~|k|²)'
+        w.writerow(['FHN', f'{fhn["S_norm"]:.4f}', f'{fhn["D_norm_mean"]:.4f}',
+                     f'{fhn["SD_ratio"]:.4f}',
+                     f'{disp_fhn["r2_im_vs_k"]:.4f}', f'{disp_fhn["r2_im_vs_k2"]:.4f}',
+                     f'{disp_fhn["r2_re_vs_k2"]:.4f}', dom])
+        print(f"  FHN:       S/D = {fhn['SD_ratio']:.3f}  |  {dom}")
 
         # NS
         for key, (ns_info, ns_disp) in ns_results.items():
@@ -259,17 +257,13 @@ def main(args):
             print(f"  {label}: S/D = {ns_info['SD_ratio']:.3f}  |  {dom}")
 
     print(f"\nSaved to {summary_path}")
-    print(f"\nKey prediction:")
-    print(f"  SWE should have S/D >> NS (wave-dominated vs advection-dominated)")
-    print(f"  SWE should have Im(λ)~|k| (linear dispersion)")
-    print(f"  NS  should have Re(λ)~|k|² (viscous dissipation)")
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ckpt_swe', required=True)
+    parser.add_argument('--ckpt_fhn', required=True)
     parser.add_argument('--ckpt_ns_1e5', default=None)
     parser.add_argument('--ckpt_ns_1e3', default=None)
-    parser.add_argument('--out_dir', default='./swe_analysis')
+    parser.add_argument('--out_dir', default='outputs/fhn_spectrum')
     args = parser.parse_args()
     main(args)

@@ -1,21 +1,14 @@
-"""Rotation rates of S, routing of optical frequencies onto them, and the beta2 readout
-(Section 3.3, Fig. 4, Appendix A.8). The analysis is analyse() from the paper's
-nlse_ladder/analysis/fig_data.py, unchanged; only the paths became arguments.
+"""Rotation rates of S, routing of optical frequencies onto them, and the beta2 readout.
 
-Per model it reports:
-  rungs        the 16 rotation rates |w_j| of S (radians per snapshot), sorted
-  f_top[k]     for optical mode k: the rotation rate carrying most of its latent energy
-               on the held-out pulses (indices 1000:1200)
-  link1        rank correlation and through-origin slope of f_top vs the predicted phase
-               advance 0.5|beta2| w_k^2 dz, over modes k > 0 with >= 1% of the latent energy
-  link2        top rate, predicted band-edge advance, their ratio, and
-               beta2_implied = top / (0.5 w_15^2 dz) = 13.56 x top at dz = 0.166 km
-
-The beta2 readout needs only the checkpoint; the routing needs the model's test pulses.
+Paper: Section 3.3, Fig. 4, Appendix A.8.
 
 Usage:
-    python nlse/readout.py --ckpt checkpoints/nlse/final_koopman_nlse_b2_20_s1.pt \
-        --data data/nlse/nlse_b2_20_soliton.mat --beta2 -20 [--out readout.json]
+    python nlse/readout.py --ckpt checkpoints/nlse/b2_20_s1.pt --data data/nlse/nlse_b2_20_soliton.mat --beta2 -20 [--out readout.json]
+
+Reports the 16 rotation rates of S (radians per snapshot), the rotation rate carrying most of each optical
+mode's latent energy on the test pulses (1000:1200), its through-origin slope and rank correlation against the
+predicted phase advance 0.5 |beta2| w_k^2 dz (modes k > 0 with >= 1% of the energy), and
+|beta2| = 13.56 x (top rate) at dz = 0.166 km. The beta2 readout needs only the checkpoint.
 """
 import sys, os, json, argparse, warnings, contextlib, io
 import numpy as np, torch, pandas as pd

@@ -1,21 +1,9 @@
-"""
-Release: the "Unconstrained L" column of Table A.2 and Fig. A.3(a) (Appendix A.5).
-    python navier_stokes/ablations/ablation_unconstrained_L.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --save_dir runs/ablations
-Released checkpoint: checkpoints/ns_ablations/structural/unconstrained.pt (lowest test L2 over 500 epochs).
+"""Structural ablation: unconstrained generator L_k = A + diag(b |k|^2 / k_max^2) (no skew-symmetry, no positivity).
 
-Original docstring:
-ABLATION: Unconstrained L — NO S-D decomposition
-==================================================
-Same encoder/decoder/data/optimizer as LGN-KM, but the generator is an
-unconstrained r×r matrix A plus an unconstrained diagonal k-dependent term.
-No skew-symmetry, no softplus positivity — nothing prevents Re(λ) > 0.
-
-This is the critical ablation: proves the S-D structure matters beyond
-just "having a Koopman generator."
+Paper: Appendix A.5, Table A.2, Fig. A.3(a) (checkpoints/ns_ablations/structural/unconstrained.pt).
 
 Usage:
-    CUDA_VISIBLE_DEVICES=0 python ablation_unconstrained_L.py \
-        --data NavierStokes_V1e-5_N1200_T20.mat --tag ablation_unconstrained_nu1e5
+    python navier_stokes/ablations/ablation_unconstrained_L.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --save_dir outputs/ablations
 """
 
 import torch
@@ -322,6 +310,6 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/ablations')
     args = parser.parse_args()
     train(args)

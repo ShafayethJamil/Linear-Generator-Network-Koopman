@@ -1,32 +1,13 @@
-"""
-E2b — KOOPMAN NEURAL OPERATOR BASELINE (suVX ref [3], Xiong et al.)
-====================================================================
-Uses the AUTHORS' OWN package (koopmanlab) so the implementation cannot be
-disputed, wrapped in our exact data protocol: same .mat file, same
-train/test split (first n_train / next n_test), same T_in/T_out, RAW data
-(no normalization), and the SAME paper metric (per-sample relative L2 over
-the full T_out*H*W volume) computed by US on the trained model — we do not
-rely on the package's internal metric.
+"""Koopman neural operator (KNO) baseline, using the authors' koopmanlab package.
 
-Install (their repo: github.com/Koopman-Laboratory/KoopmanLab):
-    pip install koopmanlab
-  or:
-    git clone https://github.com/Koopman-Laboratory/KoopmanLab && pip install -e KoopmanLab
+Paper: Table 1 (KNO row) and the KNO rows of Table A.6.
 
-KNO hyperparameters follow the KNO paper's own 2D Navier-Stokes settings
-(operator size o=32, modes m=16 wait — use their published NS defaults;
-adjustable via CLI so we can also report a tuned version). If their API
-differs from the version documented here, the two marked call sites
-(BUILD and TRAIN) are the only lines to adjust.
+Usage (seeds 0, 1, 2):
+    python baselines/kno.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --tag kno_nu1e5_s0 --seed 0
+    python baselines/kno.py --data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40 --tag kno_nu1e3_s0 --seed 0
 
-Usage:
-  CUDA_VISIBLE_DEVICES=0 python baselines/kno.py --data NavierStokes_V1e-5_N1200_T20.mat --tag kno_nu1e5
-
-Repository usage (from the root; Table 1, A.9). Seeds 0-2; nu=1e-3 uses
---data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40  (koopmanlab 1.0.3):
-  python baselines/kno.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat \
-      --tag kno_nu1e5_s0 --seed 0 --save_dir outputs/baselines
-Shipped outputs: baselines/results/; checkpoints: checkpoints/baselines/.
+Requires koopmanlab (pip install koopmanlab; 1.0.3 was used). Same data split and T_in/T_out
+as LGN-KM; the test error is computed with the paper metric, not the package's own.
 """
 
 import torch
@@ -237,7 +218,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs',   type=int,   default=500)
     parser.add_argument('--batch',    type=int,   default=10)
     parser.add_argument('--lr',       type=float, default=1e-3)
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/baselines')
     args = parser.parse_args()
     set_seed(args.seed)
     main(args)

@@ -1,37 +1,12 @@
-"""
-Cross-viscosity transfer experiment for LGN-KM
-================================================
-Pretrain: ν=1e-5 (checkpoint)
-Target:   ν=1e-3 (fine-tune with varying data budgets)
+"""Cross-viscosity transfer: train on nu = 1e-3 from scratch, or fine-tune the nu = 1e-5 model with all parameters or with S frozen.
 
-Three conditions at each data budget [50, 100, 200, 500, 1000]:
-  1. scratch       — random init, train on ν=1e-3
-  2. transfer_all  — load ν=1e-5 checkpoint, fine-tune everything
-  3. transfer_freezeS — load checkpoint, freeze S (P matrix), fine-tune rest
+Paper: Section 4.2, Fig. 6, Appendix A.3, Table A.1 (checkpoints/transfer/).
 
-Paper: Section 4.2, Fig. 6, Appendix A.3 / Table A.1. The released runs are
-seed 0 only (checkpoints/transfer/, curves in transfer/results/).
+Usage:
+    python transfer/transfer_experiment.py --pretrained checkpoints/ns/lgnkm_nu1e5_s0.pt --data data/ns/ns_V1e-3_N5000_T50.mat --condition transfer_freezeS --n_train 100 --save_dir outputs/transfer
+        (conditions scratch | transfer_all | transfer_freezeS; n_train 50, 100, 200, 500, 1000; omit both flags to run all 15)
 
-Learning rate: the two transfer conditions fine-tune at 0.3 x --lr
-(3e-4 for the default 1e-3); scratch trains at --lr. This is the setting that
-produced the paper's numbers. The log header prints the learning rate actually used.
-Same data pool (first N of trajectories 0:1000) and test set (1000:1200) as the
-main nu=1e-3 model; checkpoint = lowest test L2 over 500 epochs.
-
-Usage (from the repo root):
-    # One condition (the paper ran the 15 (condition, N) pairs in parallel):
-    python transfer/transfer_experiment.py \
-        --pretrained checkpoints/ns/lgnkm_nu1e5_s0.pt \
-        --data data/ns/ns_V1e-3_N5000_T50.mat \
-        --condition transfer_freezeS --n_train 100 --save_dir transfer/runs
-
-    # All conditions and budgets sequentially:
-    python transfer/transfer_experiment.py \
-        --pretrained checkpoints/ns/lgnkm_nu1e5_s0.pt \
-        --data data/ns/ns_V1e-3_N5000_T50.mat --save_dir transfer/runs
-
-    # Fig. 6(b,c) numbers from the curves:
-    python transfer/fig6_metrics.py --results_dir transfer/results
+The transfer conditions fine-tune at 0.3 x --lr; scratch trains at --lr. Seed 0.
 """
 
 import torch
@@ -47,7 +22,7 @@ np.random.seed(0)
 
 
 # ============================================================
-# Model (identical to koopman_nu1e5_raw.py)
+# Model (identical to navier_stokes/train_lgnkm.py)
 # ============================================================
 
 class SpectralConv2d(nn.Module):
@@ -159,7 +134,7 @@ def paper_rel_l2_loss(pred, target):
 
 
 # ============================================================
-# Data loading (from koopman_nu1e3_raw.py, NO normalization)
+# Data loading (as navier_stokes/train_lgnkm.py, no normalization)
 # ============================================================
 
 def load_data(mat_path, T_in=10, T_out=40, n_train=1000, n_test=200, target_res=64):
@@ -235,7 +210,7 @@ def run_one(condition, n_sub, pretrained_path, data_path, save_dir,
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     tag = f"{condition}_N{n_sub}_s{seed}"
-    # header shows the lr actually used (originally printed the nominal --lr)
+    # header shows the learning rate actually used
     print(f"\n{'='*60}")
     print(f"  {tag}  |  epochs={epochs}  lr={lr * 0.3 if condition.startswith('transfer') else lr}")
     print(f"{'='*60}")
@@ -351,10 +326,10 @@ def run_one(condition, n_sub, pretrained_path, data_path, save_dir,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--pretrained', required=True,
-                        help='Path to best_koopman_nu1e5_raw.pt')
+                        help='pretrained nu=1e-5 checkpoint, e.g. checkpoints/ns/lgnkm_nu1e5_s0.pt')
     parser.add_argument('--data', required=True,
-                        help='Path to ns_V1e-3_N5000_T50.mat')
-    parser.add_argument('--save_dir', default='./transfer_results')
+                        help='nu=1e-3 benchmark, e.g. data/ns/ns_V1e-3_N5000_T50.mat')
+    parser.add_argument('--save_dir', default='outputs/transfer')
     parser.add_argument('--epochs', type=int, default=500)
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--batch', type=int, default=10)

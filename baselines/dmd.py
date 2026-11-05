@@ -1,37 +1,14 @@
-"""
-E2a — DMD BASELINE (rebuttal, suVX W3 / pbkH W3)
-=================================================
-Exact DMD (Tu et al. 2014 / Schmid 2010) on the SAME data, SAME train/test
-split, SAME paper metric as LGN-KM and FNO. Self-contained numpy; CPU-only.
+"""Exact DMD baseline on the raw Navier-Stokes field (CPU, numpy).
 
-Protocol (mirrors the neural runs exactly):
-  - Train: first n_train trajectories. Snapshot pairs (x_t, x_{t+1}) pooled
-    over the FULL T frames of each training trajectory (t = 0..T-2).
-  - Rank-truncated exact DMD at each rank in --ranks (default matches r=32,
-    plus higher ranks so no one can say the linear baseline was starved).
-  - Test: for each held-out trajectory, take frame T_in (the last input
-    frame, same conditioning information boundary as the neural models),
-    roll the DMD operator forward T_out steps, compute the per-sample
-    relative L2 over the full (T_out*H*W) volume on RAW data.
-  - Also reports the DMD eigenvalues: % with |mu| <= 1 (discrete-time
-    stability) and max |mu| -> the "no stable structured generator" row
-    of the baseline table.
+Paper: Table 1 (DMD row: test relative L2, max|mu|).
 
 Usage:
-  python baselines/dmd.py --data NavierStokes_V1e-5_N1200_T20.mat --tag dmd_nu1e5
-  python baselines/dmd.py --data NavierStokes_V1e-3_N5000_T50.mat --tag dmd_nu1e3
-  (add --n_train/--n_test/--T_in/--T_out to match the nu=1e-3 protocol if
-   it differs; defaults mirror the nu=1e-5 runs: 1000/200/10/10)
+    python baselines/dmd.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat --tag dmd_nu1e5
+    python baselines/dmd.py --data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40 --tag dmd_nu1e3
 
-Outputs (./checkpoints by default):
-  dmd_results_<tag>.csv   one row per rank: rank, test_rel_l2, pct_stable_eigs,
-                          max_abs_mu, per-step L2 at t=1..T_out
-
-Repository usage (from the root; Table 1, A.9). Seeds 0-2; nu=1e-3 uses
---data data/ns/ns_V1e-3_N5000_T50.mat --T_out 40:
-  python baselines/dmd.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat \
-      --tag dmd_nu1e5_s0 --seed 0 --save_dir outputs/baselines
-Shipped outputs: baselines/results/; checkpoints: checkpoints/baselines/.
+Snapshot pairs are pooled over the training trajectories; each test trajectory is rolled
+forward from its last input frame. Table 1 reports the best of ranks 32-256.
+Writes dmd_results_<tag>.csv and dmd_eigs_<tag>.csv to --save_dir.
 """
 
 import numpy as np
@@ -129,8 +106,7 @@ def main(args):
         w.writerow(['rank', 'test_rel_l2', 'pct_stable_eigs', 'max_abs_mu']
                    + [f'l2_step{t}' for t in range(1, args.T_out + 1)])
 
-    # full DMD eigenvalue spectrum per rank (for spectrum plots + audit of the
-    # %stable / max|mu| claim). mu is discrete-time; log(mu) gives the
+    # full DMD eigenvalue spectrum per rank (%stable and max|mu|). mu is discrete-time; log(mu) gives the
     # continuous-time generator eigenvalue for comparison with LGN's Re(lambda).
     eig_path = os.path.join(args.save_dir, f'dmd_eigs_{args.tag}.csv')
     with open(eig_path, 'w', newline='') as f:
@@ -185,8 +161,6 @@ def main(args):
               f"step1 {per_step[0]:.4f} -> step{args.T_out} {per_step[-1]:.4f}")
 
     print(f"\nWrote {out_path}")
-    print("Table row for the rebuttal: best-rank DMD vs LGN-KM vs FNO, "
-          "rel-L2 + stability + interpretable-generator columns.")
 
 
 if __name__ == '__main__':
@@ -201,6 +175,6 @@ if __name__ == '__main__':
     parser.add_argument('--n_test',  type=int, default=200)
     parser.add_argument('--ranks',   type=int, nargs='+',
                         default=[32, 64, 128, 256])
-    parser.add_argument('--save_dir', default='./checkpoints')
+    parser.add_argument('--save_dir', default='outputs/baselines')
     args = parser.parse_args()
     main(args)

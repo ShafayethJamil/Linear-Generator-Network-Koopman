@@ -1,17 +1,11 @@
-"""
-β₂ Sweep Data Generator for Koopman-LGN Calibration
-=====================================================
-Generates NLSE datasets at multiple β₂ values with IDENTICAL
-initial condition distributions (same seeds, same P0/T0/chirp/shape).
+"""Generate the optical-fiber NLSE datasets by split-step Fourier integration, with the same pulses at every beta2.
 
-This isolates the effect of β₂ on the learned eigenspectrum slope,
-enabling quantitative calibration: slope(β₂) = C × β₂.
+Paper: Section 3.3, Appendix A.8.
 
-Usage (paper datasets, Section 3.3 / Appendix A.8; fixed seed 42):
+Usage:
     python nlse/datagen.py --regime soliton --beta2_list -10 -15 -20 -25 -30 --save_dir data/nlse
-    # add -5 for the below-resolution point of Appendix A.8 (i)
-
-Pulse-ensemble tests of Appendix A.8 (iii), all at beta2 = -20 (T0 in ps, P0 in W):
+        (add -5 for the below-resolution fiber of A.8)
+Pulse-ensemble variants of A.8 (beta2 = -20; T0 in ps, P0 in W):
     NLSE_TAG=_wide   NLSE_T0_RANGE=5,10  python nlse/datagen.py --beta2 -20 --seed 42 --save_dir data/nlse_ensembles
     NLSE_TAG=_narrow NLSE_T0_RANGE=2,4   python nlse/datagen.py --beta2 -20 --seed 42 --save_dir data/nlse_ensembles
     NLSE_TAG=_hipow  NLSE_P0_RANGE=0.5,1 python nlse/datagen.py --beta2 -20 --seed 42 --save_dir data/nlse_ensembles
@@ -117,12 +111,12 @@ def generate_sweep_dataset(beta2_value, regime, n_samples, seed=42):
     else:
         raise ValueError(f"Regime must be 'soliton' or 'nonlinear', got '{regime}'")
 
-    # AUDIT OVERRIDE: pulse-ensemble ranges from environment (unchanged if unset)
+    # optional pulse-ensemble ranges from the environment (unchanged if unset)
     if os.environ.get('NLSE_T0_RANGE'):
         T0_range = tuple(float(v) for v in os.environ['NLSE_T0_RANGE'].split(','))
     if os.environ.get('NLSE_P0_RANGE'):
         P0_range = tuple(float(v) for v in os.environ['NLSE_P0_RANGE'].split(','))
-    print(f'  [audit] P0_range={P0_range} T0_range={T0_range}')
+    print(f'  pulse ensemble: P0_range={P0_range} T0_range={T0_range}')
     # Fixed z_total for all β₂ — ensures identical dz_snap across sweep
     N_z_steps = int(z_total / dz)
     save_every = max(1, N_z_steps // 30)
@@ -225,7 +219,7 @@ def main():
     parser.add_argument('--n_train', type=int, default=1000)
     parser.add_argument('--n_test', type=int, default=200)
     parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--save_dir', default='./nlse_data_sweep')
+    parser.add_argument('--save_dir', default='data/nlse')
     args = parser.parse_args()
 
     os.makedirs(args.save_dir, exist_ok=True)

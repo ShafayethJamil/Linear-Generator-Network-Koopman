@@ -1,28 +1,15 @@
-"""
-Continuous-Time Prediction: Koopman-LGN vs FNO
-=================================================
-Koopman: expm(L·t) for ANY t — one matrix exponential, no autoregression
-FNO:     can only produce t=1,2,3,... via autoregression
+"""Continuous-time evaluation of LGN-KM against autoregressive FNO, and wall time vs horizon.
 
-This script:
-    1. Evaluates both models at integer steps t=1..10 (standard)
-    2. Evaluates Koopman at sub-integer steps t=0.5, 1.5, 2.5, ...
-    3. Uses linear interpolation of ground truth for sub-integer validation
-    4. Shows Koopman can query t=0.1, 0.5, 0.9 between any two frames
-    5. Evaluates at arbitrary non-uniform times (t=π, t=e, etc.)
-    6. Cost comparison: Koopman same cost for any t, FNO cost scales linearly
+Paper: Section 4.1, Fig. 5c (wall time vs prediction horizon, experiment 3 below).
 
-The paper uses experiment 3 only (Fig. 5c: wall time vs horizon). Its timing
-is unaffected by the frame-index fix below; the accuracy columns of the other
-experiments were one frame late in the original and are corrected here.
+Usage:
+    python continuous_time/continuous_time.py --data data/ns/NavierStokes_V1e-5_N1200_T20.mat \
+        --ckpt_koopman checkpoints/ns/lgnkm_nu1e5_s0.pt --ckpt_fno checkpoints/ns/fno_nu1e5.pt
 
-Usage (from the repository root):
-    python continuous_time/continuous_time.py \
-        --data data/ns/NavierStokes_V1e-5_N1200_T20.mat \
-        --ckpt_koopman checkpoints/ns/lgnkm_nu1e5_s0.pt \
-        --ckpt_fno checkpoints/ns/fno_nu1e5.pt \
-        --save_dir outputs/continuous_time
-Shipped output: continuous_time/results/continuous_time_cost_scaling.csv (Fig. 5c).
+Experiments 1-2 query LGN-KM at sub-integer and arbitrary times (one matrix exponential per
+query); experiment 3 times both models. Wall times depend on the GPU and its load. Writes
+continuous_time_cost_scaling.csv and figures to --save_dir; the paper's timing CSV is in
+continuous_time/results/.
 """
 
 import torch
@@ -236,8 +223,7 @@ def interpolate_gt(u_full, T_in, t_float):
     Returns: (B, H, W)
     """
     # Model step t is frame index T_in - 1 + t (training targets are
-    # u[..., T_in:T_in+T_out] for steps 1..T_out). The original used T_in + t,
-    # one frame late, which roughly doubled every accuracy number; fixed for release.
+    # u[..., T_in:T_in+T_out] for steps 1..T_out). Fixed off-by-one: T_in + t was one frame late.
     abs_t = T_in - 1 + t_float  # absolute time index
     t_lo = int(np.floor(abs_t))
     t_hi = t_lo + 1
@@ -268,7 +254,7 @@ def main():
     parser.add_argument('--data', required=True)
     parser.add_argument('--ckpt_koopman', required=True)
     parser.add_argument('--ckpt_fno', required=True)
-    parser.add_argument('--save_dir', default='./figures_continuous')
+    parser.add_argument('--save_dir', default='outputs/continuous_time')
     args = parser.parse_args()
 
     os.makedirs(args.save_dir, exist_ok=True)
@@ -303,7 +289,6 @@ def main():
     print("="*70)
 
     # Max valid prediction offset (T=20, T_in=10 → index 19 → step 10).
-    # The original capped this at 9, a symptom of the off-by-one fixed above.
     T_out_max = T_total - 10
     # Dense times for Koopman
     t_dense = np.arange(0.1, T_out_max + 0.01, 0.1)  # 0.1 to 9.0
@@ -342,7 +327,7 @@ def main():
         wall = time.time() - t0
 
         pred = pred_all[:, -1]                          # last step
-        gt = u_full[:n_eval, :, :, 9 + t_int]          # exact integer GT (step t = frame 9+t; was 10+t)
+        gt = u_full[:n_eval, :, :, 9 + t_int]          # exact integer GT (step t = frame 9+t)
         errs = per_sample_rel_l2(pred, gt)
         fno_integer_errors.append((t_int, errs.mean().item(), errs.std().item()))
         fno_wall_times.append(wall)
@@ -357,7 +342,7 @@ def main():
         torch.cuda.synchronize() if torch.cuda.is_available() else None
         wall = time.time() - t0
 
-        gt = u_full[:n_eval, :, :, 9 + t_int]          # step t = frame 9+t (was 10+t)
+        gt = u_full[:n_eval, :, :, 9 + t_int]          # step t = frame 9+t
         errs = per_sample_rel_l2(pred, gt)
         koopman_integer_errors.append((t_int, errs.mean().item(), errs.std().item()))
         koopman_wall_times.append(wall)
@@ -551,7 +536,7 @@ def main():
     # --- Panel C: Cost scaling ---
     ax = fig.add_subplot(gs[0, 2])
     ax.loglog(horizons, koopman_costs, 'o-', color=c_k, linewidth=2, markersize=8,
-              label='Koopman-LGN')
+              label='LGN-KM')
     ax.loglog(horizons, fno_costs, 's-', color=c_f, linewidth=2, markersize=8,
               label='FNO-2D')
     ax.set_xlabel('Prediction Horizon T', fontsize=13)
@@ -605,13 +590,13 @@ def main():
     print(f"CONTINUOUS-TIME RESULTS")
     print(f"{'='*70}")
     print(f"""
-  Koopman-LGN evaluates at ANY continuous time via expm(L·t).
+  LGN-KM evaluates at ANY continuous time via expm(L·t).
   FNO can only produce integer steps via autoregression.
 
   At integer steps (fair comparison):
     Koopman t=1: {koopman_integer_errors[0][1]:.4f}   FNO t=1: {fno_integer_errors[0][1]:.4f}
     Koopman t=5: {koopman_integer_errors[4][1]:.4f}   FNO t=5: {fno_integer_errors[4][1]:.4f}
-    Koopman t=9: {koopman_integer_errors[-1][1]:.4f}  FNO t=9: {fno_integer_errors[-1][1]:.4f}
+    Koopman t={koopman_integer_errors[-1][0]:g}: {koopman_integer_errors[-1][1]:.4f}  FNO t={fno_integer_errors[-1][0]:g}: {fno_integer_errors[-1][1]:.4f}
 
   Koopman at sub-integer times (FNO impossible):
     t=0.5: {[x[1] for x in koopman_dense_errors if abs(x[0]-0.5)<0.01][0]:.4f}

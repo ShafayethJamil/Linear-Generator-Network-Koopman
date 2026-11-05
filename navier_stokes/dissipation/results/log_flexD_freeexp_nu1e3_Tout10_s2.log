@@ -1,6 +1,6 @@
 nohup: ignoring input
 Device: cuda
-Loading /home/shafayeth/LGN_koopman/ns_V1e-3_N5000_T50.mat ...
+Loading data/ns/ns_V1e-3_N5000_T50.mat ...
   Format: HDF5, key='u', raw shape=(50, 64, 64, 5000)
   Parsed: N=5000 H=64 W=64 T=50
   Train: torch.Size([1000, 64, 64, 10]) -> torch.Size([1000, 64, 64, 10])
@@ -65,4 +65,4 @@ DONE [FlexD freeexp flexD_freeexp_nu1e3_s2]  best test_l2 = 0.0044
 final learned exponent p = 1.2151  (imposed form = 2)
 ============================================================
 Now run analysis:
-  python lgn_flexD.py --data /home/shafayeth/LGN_koopman/ns_V1e-3_N5000_T50.mat --Dparam freeexp --tag flexD_freeexp_nu1e3_s2 --analyze
+  python lgn_flexD.py --data data/ns/ns_V1e-3_N5000_T50.mat --Dparam freeexp --tag flexD_freeexp_nu1e3_s2 --analyze

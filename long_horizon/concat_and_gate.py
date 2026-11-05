@@ -1,11 +1,13 @@
-"""
-Concatenate the four 50-trajectory parts into one 200-trajectory truth file, then
-apply the energy gate fixed before the run: mean omega^2 at t = 1, as a ratio to
-the Li et al. benchmark test split, must lie in [0.90, 1.10]. Exit code 1 if not,
-so the pipeline never evaluates on a file that fails the gate.
+"""Concatenate the 50-trajectory parts into one truth file and apply the energy gate.
 
-Usage: python long_horizon/concat_and_gate.py OUT FRAME_INDEX PART [PART ...]
-(benchmark path: LGNKM_BENCH, default data/ns/NavierStokes_V1e-5_N1200_T20.mat)
+Paper: Appendix A.9; called by long_horizon/run_pipeline.sh.
+
+Usage:
+    python long_horizon/concat_and_gate.py OUT FRAME_INDEX PART [PART ...]
+
+Gate: mean omega^2 at t = 1 must be within [0.90, 1.10] of the benchmark test split; the
+script exits with code 1 otherwise, so nothing is evaluated on a file that fails.
+Benchmark path: $LGNKM_BENCH (default data/ns/NavierStokes_V1e-5_N1200_T20.mat).
 """
 import json
 import sys

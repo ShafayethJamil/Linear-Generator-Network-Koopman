@@ -1,21 +1,11 @@
-"""
-Release: per-branch R^2 for the r-sweep (Appendix A.2: dominant-branch R^2, median branch R^2 at r = 64).
-Branch fits skip the k = 0 mode (Table A.8 in Appendix A.10, from analyze_spectral.py, keeps it).
-    python navier_stokes/ablations/ablation_r2_fix.py --save_dir checkpoints/ns_ablations/r_sweep
+"""Per-branch R^2 of Re(lambda) vs |k|^2 for the r-sweep checkpoints, and the A.2 figure.
 
-Original docstring:
-Recompute eigenspectrum R² per branch for ablation checkpoints.
-================================================================
-For each r and viscosity, loads the best checkpoint, computes R² for
-EACH of the r eigenvalue branches (sorted by mean Re(λ)), and reports:
-  - Best single-branch R²
-  - Mean of top-3 branch R²
-  - Original dominant-eigenvalue R² (for comparison)
-
-Then regenerates the ablation figure with the corrected metric.
+Paper: Appendix A.2 (dominant-branch R^2; median branch R^2 at r = 64).
 
 Usage:
-    python ablation_r2_fix.py --save_dir ./ablation_results
+    python navier_stokes/ablations/ablation_r2_fix.py --save_dir checkpoints/ns_ablations/r_sweep
+
+Branch fits skip the k = 0 mode (analyze_spectral.py, used for Table A.8, keeps it).
 """
 
 import torch
@@ -332,7 +322,7 @@ def generate_figure(all_results, save_dir):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--save_dir', default='./ablation_results')
+    parser.add_argument('--save_dir', default='outputs/r_sweep')
     args = parser.parse_args()
 
     all_results = []

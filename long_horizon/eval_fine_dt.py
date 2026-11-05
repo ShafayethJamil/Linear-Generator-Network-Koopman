@@ -1,30 +1,15 @@
-"""
-E4 — CONTINUOUS-TIME EVAL AT UNSEEN TEMPORAL RESOLUTIONS (suVX W5)
-===================================================================
-Loads the paper's LGN-KM checkpoint (trained ONLY on the integer dt=1 grid)
-and evaluates it at fractional times t = 11.25 ... 19.75 against fine-dt
-ground truth (generate_ns_finedt.py), via a single matrix exponential
-exp(L·t) per query — no retraining, no interpolation.
+"""Query LGN-KM at times between its training frames with one matrix exponential each.
 
-Baselines at the same fractional times:
-  - interp_lgn  : linear interpolation between the model's OWN predictions
-                  at the adjacent integer times (what a practitioner would
-                  do with any fixed-step model, incl. FNO).
-  - interp_true : linear interpolation between the adjacent integer-time
-                  GROUND-TRUTH frames (oracle; measures how much genuine
-                  sub-frame structure exists to be captured at all).
+Paper: Section 4.1 and Appendix A.9, Table A.7.
 
-If direct exp(L·t) beats interp_lgn and approaches interp_true's gap, the
-continuous-time parameterization carries real temporal information beyond
-the training grid.
+Usage:
+    python long_horizon/eval_fine_dt.py --data outputs/long_horizon/ns_finedt_nu1e5_N200_T20_fixed.mat \
+        --koopman_ckpt checkpoints/ns/lgnkm_nu1e5_s0.pt
 
-Usage (from the repository root; Table A.7 of the paper):
-  python long_horizon/eval_fine_dt.py \
-      --data outputs/long_horizon/ns_finedt_nu1e5_N200_T20_fixed.mat \
-      --koopman_ckpt checkpoints/ns/lgnkm_nu1e5_s0.pt --save_dir outputs/long_horizon/results/finedt
-Shipped output of that run: long_horizon/results/finedt/E4_*.csv
-
-Outputs (./checkpoints): E4_fine_dt.csv (per query time), E4_summary.csv
+The model, trained on the integer dt = 1 grid, is evaluated at t = 11.25 ... 19.75 against
+linear interpolation of its own integer-time predictions and of the true frames (an oracle).
+Writes fine_dt.csv (per query time) and summary.csv to --save_dir. The paper's output is in
+long_horizon/results/finedt/.
 """
 
 import torch
@@ -193,7 +178,7 @@ def main(args):
     int_index = {tau: i for i, tau in enumerate(int_taus)}
 
     os.makedirs(args.save_dir, exist_ok=True)
-    per_path = os.path.join(args.save_dir, 'E4_fine_dt.csv')
+    per_path = os.path.join(args.save_dir, 'fine_dt.csv')
     rows = []
     with open(per_path, 'w', newline='') as f:
         wcsv = csv.writer(f)
@@ -217,7 +202,7 @@ def main(args):
     # sanity: integer-time errors (should match paper-style per-step numbers)
     int_errs = {tau: rel_l2(pred_int[:, i], frame_at(tau)) for tau, i in int_index.items()}
 
-    summ_path = os.path.join(args.save_dir, 'E4_summary.csv')
+    summ_path = os.path.join(args.save_dir, 'summary.csv')
     with open(summ_path, 'w', newline='') as f:
         wcsv = csv.writer(f)
         wcsv.writerow(['metric', 'lgn_direct', 'interp_lgn', 'interp_true'])
@@ -231,7 +216,7 @@ def main(args):
         wcsv.writerow(['mean_frac_tau<=15'] + [f'{v:.6f}' for v in sel.mean(axis=0)])
     print(f"wrote {summ_path}")
 
-    print("\n=== E4 summary ===")
+    print("\n=== summary ===")
     print(f"integer-time sanity: t=11 {int_errs[11]:.4f}, t=15 {int_errs.get(15, float('nan')):.4f}, "
           f"t=20 {int_errs.get(20, float('nan')):.4f}")
     print(f"fractional times, mean rel-L2 over {len(rows)} queries:")
@@ -248,6 +233,6 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--data',         required=True)
     p.add_argument('--koopman_ckpt', required=True)
-    p.add_argument('--save_dir',     default='./checkpoints')
+    p.add_argument('--save_dir',     default='outputs/long_horizon/results/finedt')
     args = p.parse_args()
     main(args)

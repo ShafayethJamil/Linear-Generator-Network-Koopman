@@ -1,14 +1,15 @@
 #!/bin/bash
-# Regenerate the long-horizon (Table A.6) and unseen-time-resolution (Table A.7)
-# ground truth with the Li et al. initial-condition convention, gate it on initial
-# energy, then evaluate the released checkpoints. 4 x 50 trajectories per file, one
-# part per GPU (set GPUS to change). The paper's run took ~2.2 h on 4 RTX A5000s.
+# Generate the long-horizon and fine-dt Navier-Stokes truth, gate it on initial energy,
+# and evaluate the checkpoints on it.
 #
-#   bash long_horizon/run_pipeline.sh            # from the repository root
+# Paper: Appendix A.9, Tables A.6 and A.7.
 #
-# Energy gate, fixed before the paper's run: mean omega^2 at t = 1 must lie within
-# [0.90, 1.10] of the benchmark test split (needs data/ns/NavierStokes_V1e-5_N1200_T20.mat).
-# The paper's run gave 0.951 (long) and 0.959 (fine dt): long_horizon/results/*_gate.json.
+# Usage (from the repository root; ~2.2 h on 4 GPUs, set GPUS / PY to override):
+#   bash long_horizon/run_pipeline.sh
+#
+# 4 x 50 trajectories per file. Energy gate: mean omega^2 at t = 1 must lie within
+# [0.90, 1.10] of the benchmark test split (needs data/ns/NavierStokes_V1e-5_N1200_T20.mat);
+# a file that fails is not evaluated. The paper's values: long_horizon/results/*_gate.json.
 set -u
 cd "$(dirname "$0")/.."
 PY=${PY:-python}

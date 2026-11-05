@@ -1,12 +1,9 @@
-"""
-Extract S, D, alpha, d from Koopman checkpoints into CSV files.
-Run on your GPU machine, then upload the CSVs.
+"""Export S, d, alpha and the full eigenspectrum of the two Navier-Stokes models to CSV.
+
+Paper: Fig. 2 and Fig. 3b-d (Sections 3.1-3.2).
 
 Usage:
-    python extract_SD.py \
-        --ckpt_1e5 checkpoints/best_koopman_nu1e5_raw.pt \
-        --ckpt_1e3 checkpoints/best_koopman_nu1e3_raw.pt \
-        --out_dir sd_analysis
+    python navier_stokes/extract_SD.py --ckpt_1e5 checkpoints/ns/lgnkm_nu1e5_s0.pt --ckpt_1e3 checkpoints/ns/lgnkm_nu1e3_s0.pt --out_dir outputs/spectra
 """
 
 import torch
@@ -143,7 +140,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--ckpt_1e5', required=True)
     parser.add_argument('--ckpt_1e3', required=True)
-    parser.add_argument('--out_dir',  default='./sd_analysis')
+    parser.add_argument('--out_dir',  default='outputs/spectra')
     args = parser.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)

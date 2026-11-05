@@ -1,17 +1,11 @@
-"""
-Appendix A.6, free diagonal D_k = diag(softplus(B_k)): does the learned dissipation
-identify an exponent when no functional form in k is imposed?
+"""Exponent fits to the free-diagonal dissipation: rank correlation with |k|^2 and the window-dependent exponent.
 
-For each free-diagonal checkpoint the channel-mean dissipation softplus(B).mean(-1)
-is taken on the 12 x 12 retained wavevectors (integer |k|^2 = k1^2 + k2^2, 0..242).
-  rho_shell   Spearman rank correlation of the |k|^2-shell average with |k|^2
-  rho_wv      the same per wavevector (144 points)
-  p(<=C)      exponent of an offset power law  y = c + a |k|^p  fitted to the
-              shell averages with |k|^2 <= C (C = 20, 60, all); p_wv(<=C) per wavevector
-The exponent moves with the window C, which is the A.6 finding.
+Paper: Appendix A.6.
 
-Usage (from the repo root):
+Usage:
     python navier_stokes/dissipation/free_diagonal_fits.py --ckpt_dir checkpoints/dissipation
+
+Fits y = c + a |k|^p to the channel-mean softplus(B_k), per |k|^2 shell and per wavevector, over |k|^2 <= 20, 60 and all modes.
 """
 import argparse, os
 import numpy as np
@@ -27,7 +21,7 @@ K2 = (_k1 ** 2 + _k2 ** 2).ravel()
 def offset_fit(x, y, p_fixed=None):
     """Fit y = c + a*x^(p/2) with x = |k|^2 (so p is the |k| exponent).
     Returns (c, a, p, R^2). Offset REQUIRED (d0 floor).
-    (Verbatim from the paper's analyze_spectral.py.)"""
+    (Same as navier_stokes/ablations/analyze_spectral.py.)"""
     from scipy.optimize import curve_fit
     xk = np.sqrt(np.maximum(x, 0.0))
     if p_fixed is not None:

@@ -1,45 +1,16 @@
-"""
-Release: Table A.8 (Appendix A.10). Columns: max Re = max_re, median branch R^2 = r2_branch_median,
-dominant branch R^2 = r2_dom_linear_fig3a, SV-profile R^2 = the `compare` matrix against sv_M12_r32 (row = paper model).
-    C=checkpoints/ns_ablations
-    python navier_stokes/ablations/analyze_spectral.py analyze --ckpt $C/r_sweep/r4_1e5/best.pt --r 4 --modes 12 --tag r4_M12 --save_dir runs/a10
-    (likewise r8, r16, r64 from $C/r_sweep; r32: checkpoints/ns/lgnkm_nu1e5_s0.pt --tag M12_r32;
-     M=8: $C/sensitivity/M8.pt --modes 8 --tag M8_r32; M=16: $C/sensitivity/M16.pt --modes 16 --tag M16_r32;
-     normalized: $C/sensitivity/normalized_input.pt --modes 12 --tag M12_r32_norm)
-    python navier_stokes/ablations/analyze_spectral.py compare --save_dir runs/a10 --profiles runs/a10/sv_M12_r32.csv runs/a10/sv_r4_M12.csv ...
-The M = 8 and M = 16 models were trained by navier_stokes/train_lgnkm.py with --modes 8 / --modes 16 (tags nu1e5_M8, nu1e5_M16).
+"""Spectral readout of a trained generator: stability, Re(lambda) vs |k|^2 fits per branch, SV profile of S.
 
-Original docstring:
-E5 — SPECTRAL SENSITIVITY ANALYSIS (suVX Q4: spectral conclusions vs
-latent dimension r, Fourier truncation M, normalization)
-=====================================================================
-Re-analysis of saved checkpoints — NO training. For each checkpoint it
-computes the SPECTRAL metrics suVX asked about:
+Paper: Appendix A.10, Table A.8.
 
-  - % stable eigenvalues, max Re(lambda)
-  - dispersion readout: mean per-shell decay  ybar(|k|^2) = c + a*|k|^2
-    fit R^2  (correct estimator per E1 notes: offset REQUIRED; and since
-    tr S = 0, mean per-shell -Re(lambda) = mean diag D exactly)
-  - offset power-law exponent p_hat (fit ybar = c + a*|k|^p)
-  - Im-spectrum range and conjugate symmetry (skew-S sanity)
-  - normalized SVD profile of S  -> written to CSV for cross-run comparison
+Usage:
+    python navier_stokes/ablations/analyze_spectral.py analyze --ckpt checkpoints/ns/lgnkm_nu1e5_s0.pt --r 32 --modes 12 --tag M12_r32 --save_dir outputs/a10
+    python navier_stokes/ablations/analyze_spectral.py analyze --ckpt checkpoints/ns_ablations/r_sweep/r4_1e5/best.pt --r 4 --modes 12 --tag r4_M12 --save_dir outputs/a10
+        (likewise r8, r16, r64; M = 8 / 16: checkpoints/ns_ablations/sensitivity/M8.pt --modes 8 --tag M8_r32, M16.pt --modes 16 --tag M16_r32;
+         normalized input: checkpoints/ns_ablations/sensitivity/normalized_input.pt --modes 12 --tag M12_r32_norm)
+    python navier_stokes/ablations/analyze_spectral.py compare --save_dir outputs/a10 --profiles outputs/a10/sv_M12_r32.csv outputs/a10/sv_r4_M12.csv ...
 
-Modes:
-  analyze:  one row per checkpoint
-    python analyze_spectral.py analyze --ckpt best_koopman_nu1e5_raw.pt \
-        --r 32 --modes 12 --tag M12_r32
-    python analyze_spectral.py analyze --ckpt best_koopman_nu1e5_M8.pt \
-        --r 32 --modes 8 --tag M8_r32
-    (repeat for every r-ablation / M-sweep / normalized checkpoint;
-     rows append to E5_spectral_summary.csv)
-
-  compare:  R^2 between normalized SV profiles of S across runs
-    python analyze_spectral.py compare --profiles sv_M12_r32.csv sv_M8_r32.csv ...
-    (profiles of different length are compared on a common normalized
-     index grid, same convention as the paper's cross-viscosity Fig. 3b)
-
-Outputs (--save_dir, default ./checkpoints):
-  E5_spectral_summary.csv, sv_<tag>.csv, E5_sv_compare.csv
+Table A.8 columns: max_re, r2_branch_median, r2_dom_linear_fig3a, and the sv_M12_r32 row of sv_compare.csv.
+The M = 8 / 16 models are trained with navier_stokes/train_lgnkm.py --modes 8 / --modes 16.
 """
 
 import torch
@@ -143,8 +114,8 @@ def analyze(args):
     r2_branch_median = float(np.median(branch_r2))
     frac_branch_09   = float((branch_r2 > 0.9).mean())
 
-    # ---- dispersion readout C (E1 mean-shell estimator; TAUTOLOGICAL for
-    #      imposed-form checkpoints — do not quote for those) ----
+    # ---- dispersion readout: mean per-shell decay (for an imposed |k|^2 form this
+    #      is linear in |k|^2 by construction) ----
     mean_decay = (-re).mean(axis=1)                          # = mean diag D exactly (tr S = 0)
     shells = {}
     for k2v, y in zip(k2_flat, mean_decay):
@@ -168,7 +139,7 @@ def analyze(args):
         for i, (v, vn) in enumerate(zip(sv, sv_n)):
             w.writerow([i, f'{v:.8f}', f'{vn:.8f}'])
 
-    summ_path = os.path.join(args.save_dir, 'E5_spectral_summary.csv')
+    summ_path = os.path.join(args.save_dir, 'spectral_summary.csv')
     new = not os.path.exists(summ_path)
     with open(summ_path, 'a', newline='') as f:
         w = csv.writer(f)
@@ -190,7 +161,7 @@ def analyze(args):
     print(f"[{args.tag}] r={r} M={M}  n_eigs={n_tot}")
     print(f"  stability : {pct_stable:.2f}% stable, max Re = {max_re:.5f}")
     print(f"  BRANCHES  : median R^2 = {r2_branch_median:.4f}, "
-          f"{100*frac_branch_09:.0f}% of branches > 0.9   <- headline statistic")
+          f"{100*frac_branch_09:.0f}% of branches > 0.9")
     print(f"  Fig-3a    : dominant-branch linear R^2 = {r2_dom_linear:.4f} "
           f"(slope {dom_slope:.2e})   <- envelope; fragile at large r/M")
     print(f"  mean-shell: quadratic R^2 = {r2_quad:.4f}, p_hat = {p_hat:.2f} "
@@ -211,7 +182,7 @@ def compare(args):
     interp = {t: np.interp(grid, np.linspace(0, 1, len(v)), v) for t, v in profs.items()}
 
     tags = list(interp.keys())
-    out = os.path.join(args.save_dir, 'E5_sv_compare.csv')
+    out = os.path.join(args.save_dir, 'sv_compare.csv')
     with open(out, 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow([''] + tags)
@@ -241,11 +212,11 @@ if __name__ == '__main__':
     pa.add_argument('--r',     type=int, required=True)
     pa.add_argument('--modes', type=int, required=True)
     pa.add_argument('--tag',   required=True)
-    pa.add_argument('--save_dir', default='./checkpoints')
+    pa.add_argument('--save_dir', default='outputs/a10')
 
     pc = sub.add_parser('compare')
     pc.add_argument('--profiles', nargs='+', required=True)
-    pc.add_argument('--save_dir', default='./checkpoints')
+    pc.add_argument('--save_dir', default='outputs/a10')
 
     args = p.parse_args()
     if args.cmd == 'analyze':

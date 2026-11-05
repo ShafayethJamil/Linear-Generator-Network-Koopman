@@ -1,6 +1,6 @@
 #!/bin/bash
-# Download the released checkpoints into checkpoints/ and check their SHA-256
-# against every checkpoints/MANIFEST*.json.
+# Download the checkpoints into checkpoints/ and check their SHA-256 against checkpoints/MANIFEST*.json.
+# Usage: bash scripts/download_checkpoints.sh [TAG]   (default v1.1)
 set -e
 cd "$(dirname "$0")/.."
 TAG=${1:-v1.1}

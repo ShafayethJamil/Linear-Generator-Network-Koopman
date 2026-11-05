@@ -1,31 +1,21 @@
-"""
-E4 — FINE-dt NS GROUND TRUTH (suVX W5: unseen temporal resolutions)
-====================================================================
-Fresh trajectories with the SAME physics/solver as generate_ns_long.py
-(imports it directly), but recorded every 0.25 time units to t=20.
+"""Generate Navier-Stokes ground truth sampled every 0.25 time units (nu = 1e-5, t = 0.25..20).
 
-Frames at t = 0.25, 0.50, ..., 20.00 (80 frames). Integer frames t=1..10
-are the model input window; evaluation happens at the fractional times
-t = 11.25, 11.50, 11.75, 12.25, ... inside the prediction horizon —
-temporal resolutions the model has NEVER seen (training grid is dt=1).
+Paper: Section 4.1 and Appendix A.9, Table A.7 (queries between training frames); run through
+long_horizon/run_pipeline.sh.
 
-Usage (from the repository root; the paper's 200 trajectories are 4 x 50,
-seeds 4321-4324, via long_horizon/run_pipeline.sh):
-  python -u long_horizon/generate_ns_finedt.py --N 50 --seed 4321 \
-      --out outputs/long_horizon/parts/finedt_s4321.mat
+Usage (the paper's 200 trajectories are 4 x 50, seeds 4321-4324):
+    python long_horizon/generate_ns_finedt.py --N 50 --seed 4321 --out outputs/long_horizon/parts/finedt_s4321.mat
 
-Runtime: ~1-1.5 h for N=50, T=20 on one GPU (cfl=0.5: this file is GROUND
-TRUTH for sub-frame accuracy at the 0.25 level, so the solver runs at half
-the stability-edge step of the forecast-demo default — reference error must
-sit well below the quantity being measured).
+Same solver and initial conditions as generate_ns_long.py, at half its CFL number (0.5) so the
+reference error sits well below the sub-frame accuracy being measured.
 """
 
 import torch
 import numpy as np
-import math, argparse
+import math, argparse, os
 from generate_ns_long import GaussianRF, navier_stokes_2d
 
-torch.manual_seed(4321)          # different seed than E3 gen -> fresh ICs
+torch.manual_seed(4321)          # different seed than generate_ns_long.py -> fresh ICs
 np.random.seed(4321)
 
 
@@ -63,6 +53,7 @@ def main(args):
     print(f"range [{data.min():.3f}, {data.max():.3f}] mean {data.mean():.4f} std {data.std():.4f}")
 
     import h5py
+    os.makedirs(os.path.dirname(args.out) or '.', exist_ok=True)
     with h5py.File(args.out, 'w') as fo:
         fo.create_dataset('u', data=data, compression='gzip')
         fo.create_dataset('t', data=t_rec)
@@ -81,7 +72,7 @@ if __name__ == '__main__':
     p.add_argument('--cfl',          type=float, default=0.5,
                    help='half the RK4 stability edge — ground-truth accuracy margin')
     p.add_argument('--batch',        type=int,   default=50)
-    p.add_argument('--out',          default='ns_finedt_nu1e5_N50_T20.mat')
+    p.add_argument('--out',          default='outputs/long_horizon/ns_finedt_nu1e5_N50_T20.mat')
     p.add_argument('--seed',         type=int,   default=4321)
     args = p.parse_args()
     main(args)
