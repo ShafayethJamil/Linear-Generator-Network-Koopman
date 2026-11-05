@@ -86,6 +86,8 @@ Each script's docstring has the exact command for its paper result. The checkpoi
 
 Result tables from the paper's runs sit next to the code, in `baselines/results/`, `long_horizon/results/`, `transfer/results/` and `navier_stokes/dissipation/results/`.
 
+To recompute the paper's reported numbers from the released checkpoints, run `python verify/verify.py`. It takes a few seconds; add `--data_dir data/ns` to also re-evaluate test errors.
+
 ## Citation
 
 ```bibtex
