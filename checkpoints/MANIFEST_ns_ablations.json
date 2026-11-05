@@ -1,0 +1,227 @@
+{
+ "ns_ablations/r_sweep/r4_1e5/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r4_1e5/best.pt",
+  "sha256": "815e3116642b6c6cb1661b8adcd6318f2a467e61b5a278032a64578dd50845af",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/r_sweep/r4_1e5/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r4_1e5/results.json",
+  "sha256": "a6cf854c9a059f2b0d30f9957ee4664a753ea63b28b9fa0b8860f8f9099a0f46",
+  "selection": "written by ablation_r.py at the end of training"
+ },
+ "ns_ablations/r_sweep/r4_1e5/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r4_1e5/curve.csv",
+  "sha256": "0530c9cfbfc020eae1dc2265fd54adb32d3abac90e5fb6a51cfd868a81367601",
+  "selection": "training curve (test L2 every epoch)"
+ },
+ "ns_ablations/r_sweep/r4_1e3/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r4_1e3/best.pt",
+  "sha256": "71269ea233e24fbee402adaa8c4a0212246c98b60bcedbd54e882d60ee7da6c2",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/r_sweep/r4_1e3/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r4_1e3/results.json",
+  "sha256": "b68c531e65223133d1d82faaaa98fd39d2956f0adb93ab9a71e88363ad397715",
+  "selection": "written by ablation_r.py at the end of training"
+ },
+ "ns_ablations/r_sweep/r4_1e3/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r4_1e3/curve.csv",
+  "sha256": "afd8e8097d9165f42272fb4347067469868bab00181f4c39585241b59bfa2937",
+  "selection": "training curve (test L2 every epoch)"
+ },
+ "ns_ablations/r_sweep/r8_1e5/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r8_1e5/best.pt",
+  "sha256": "045fb2bd491f5a9302be98a391c538c4ce700e6666d37c563947e807dbfd6fee",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/r_sweep/r8_1e5/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r8_1e5/results.json",
+  "sha256": "302e63915b6d2a269c02477ac3ae462e11ea4f085d819ea573c76d0499c809a5",
+  "selection": "written by ablation_r.py at the end of training"
+ },
+ "ns_ablations/r_sweep/r8_1e5/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r8_1e5/curve.csv",
+  "sha256": "c120f0dc844efe33fc6cfd79264e886a74457c616cf0059aea49b30e5efcddf1",
+  "selection": "training curve (test L2 every epoch)"
+ },
+ "ns_ablations/r_sweep/r8_1e3/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r8_1e3/best.pt",
+  "sha256": "59e755d4942c9a2b7ebdacc79554fbea77bccb9b85366c1a1a76bb354907e702",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/r_sweep/r8_1e3/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r8_1e3/results.json",
+  "sha256": "52a226b6ae3b2126ceb71a91eacbdb756641feafe195c0ad4264638fb6d0cc8b",
+  "selection": "written by ablation_r.py at the end of training"
+ },
+ "ns_ablations/r_sweep/r8_1e3/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r8_1e3/curve.csv",
+  "sha256": "a095f91c8d5a131e6017bdecf08ae30e1bc955cce90ab1e42cab9098343b5848",
+  "selection": "training curve (test L2 every epoch)"
+ },
+ "ns_ablations/r_sweep/r16_1e5/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r16_1e5/best.pt",
+  "sha256": "cf76853e97c4a74cb7449dbfdeeec02bc4c895e6010122704926fe5cfcaecd80",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/r_sweep/r16_1e5/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r16_1e5/results.json",
+  "sha256": "36795f833a433a63330b0eeefb311c790e6c8bafa77473fd12d8a259ae901dc5",
+  "selection": "written by ablation_r.py at the end of training"
+ },
+ "ns_ablations/r_sweep/r16_1e5/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r16_1e5/curve.csv",
+  "sha256": "10a72947bf3371611ae4b20dde5c28824c9bb460d959fada862a92013e923119",
+  "selection": "training curve (test L2 every epoch)"
+ },
+ "ns_ablations/r_sweep/r16_1e3/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r16_1e3/best.pt",
+  "sha256": "f3c62f35a97318c2595aa1518b71444a2cd3c22bd1c1717dfcf14cc8a98a6b26",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/r_sweep/r16_1e3/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r16_1e3/results.json",
+  "sha256": "52fe8dcc3121d9541a82548d5d6465f6dcaa7dc1735973874e6950a4b49fadeb",
+  "selection": "written by ablation_r.py at the end of training"
+ },
+ "ns_ablations/r_sweep/r16_1e3/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r16_1e3/curve.csv",
+  "sha256": "78b26a47e4e85e85b60cc0dbf1e858e299d0de30a121fb485107c6018ceef8a8",
+  "selection": "training curve (test L2 every epoch)"
+ },
+ "ns_ablations/r_sweep/r32_1e5/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r32_1e5/best.pt",
+  "sha256": "9c899fc17f99c0f367735aa18c7c02b72af34f1637a34ec750a33b5ea622753c",
+  "selection": "byte-identical to the canonical seed-0 model (checkpoints/ns/lgnkm_nu1e5_s0.pt); r=32 was not re-run in the sweep"
+ },
+ "ns_ablations/r_sweep/r32_1e5/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r32_1e5/results.json",
+  "sha256": "6f476d53672ab16f336d5508f10e1447bd47134b145130c8847f971da44d3631",
+  "selection": "hand-written summary of the canonical run (as in the original sweep folder)"
+ },
+ "ns_ablations/r_sweep/r32_1e5/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints/curve_koopman_nu1e5_raw.csv",
+  "sha256": "ad0d56e1d2a23df39a1cb781ef8017eec3a0a755252fb93f0332c432d1380146",
+  "selection": "training curve of the canonical run"
+ },
+ "ns_ablations/r_sweep/r32_1e3/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r32_1e3/best.pt",
+  "sha256": "dda4ef1f65d5d89398da1957cffdcbd41c6b331a5b151ebc43d5808803cd6663",
+  "selection": "byte-identical to the canonical seed-0 model (checkpoints/ns/lgnkm_nu1e3_s0.pt); r=32 was not re-run in the sweep"
+ },
+ "ns_ablations/r_sweep/r32_1e3/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r32_1e3/results.json",
+  "sha256": "4de11a46d45bce37203ffc0ffa599c3e43a441ff3813ff33bf91054f86d9f40f",
+  "selection": "hand-written summary of the canonical run (as in the original sweep folder)"
+ },
+ "ns_ablations/r_sweep/r32_1e3/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints/curve_koopman_nu1e3_raw.csv",
+  "sha256": "192667839689c9f689546fca8e1f8a44560de9a6148d43976a0d5d3cbc78b744",
+  "selection": "training curve of the canonical run"
+ },
+ "ns_ablations/r_sweep/r64_1e5/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r64_1e5/best.pt",
+  "sha256": "f5bbdb1662e1db8f480d8c939efd1bd41702a29ba9859a663dc1e30373e0abda",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/r_sweep/r64_1e5/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r64_1e5/results.json",
+  "sha256": "11411d53e19794693f8d7b3d2e546967c52071d51e31cf2fb8fa8bc70dc63eb3",
+  "selection": "written by ablation_r.py at the end of training"
+ },
+ "ns_ablations/r_sweep/r64_1e5/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r64_1e5/curve.csv",
+  "sha256": "6fd29f5b1f1b4d303976f43968660821f8d8b39e501ca0a4521f47b5fd7186e4",
+  "selection": "training curve (test L2 every epoch)"
+ },
+ "ns_ablations/r_sweep/r64_1e3/best.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r64_1e3/best.pt",
+  "sha256": "af732ccbc380b0bd8300f729b5d95de2c0a5f8b74cd8c61da2043ad3024123dd",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/r_sweep/r64_1e3/results.json": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r64_1e3/results.json",
+  "sha256": "27d6252157408539e955a17c44d2ba2d01bff323977c6f1a095097fd2c1d7eeb",
+  "selection": "written by ablation_r.py at the end of training"
+ },
+ "ns_ablations/r_sweep/r64_1e3/curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/ablation_results/r64_1e3/curve.csv",
+  "sha256": "30fdb3ff2787fe411d238f39b2c659e16be18dfb3ac0e0d703ffe3d794db5915",
+  "selection": "training curve (test L2 every epoch)"
+ },
+ "ns_ablations/structural/unconstrained.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints_ablation/best_koopman_ablation_unconstrained_nu1e5.pt",
+  "sha256": "2fd90cd0e7dd4748c2f7d221236642b135038b0e3bd39c369d5a0beec949b9e7",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/structural/unconstrained_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints_ablation/curve_koopman_ablation_unconstrained_nu1e5.csv",
+  "sha256": "243d90d185b77eaa38b6c905c89180db6ccaee941a87a200f3f86cc9977ccb58",
+  "selection": "training curve (test L2 and max Re every epoch)"
+ },
+ "ns_ablations/structural/Sonly.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints_ablation/best_koopman_ablation_Sonly_nu1e5.pt",
+  "sha256": "2a7bb7ac9e425098e7fbd6dd33b3098cac08c6eae2ed11f476286629c35bc858",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/structural/Sonly_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints_ablation/curve_koopman_ablation_Sonly_nu1e5.csv",
+  "sha256": "544b08e2c9c7be84e22fda3bc7aa3cc4d14d584761f0992fdd41f66ad8606555",
+  "selection": "training curve (test L2 and max Re every epoch)"
+ },
+ "ns_ablations/structural/Donly.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints_ablation/best_koopman_ablation_Donly_nu1e5.pt",
+  "sha256": "1c07eedf9f3d797dbc9f4e8389face6acc5f7c53cc1153f3cb18a7f4922a57fe",
+  "selection": "lowest test L2 over 500 epochs (no validation split)"
+ },
+ "ns_ablations/structural/Donly_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints_ablation/curve_koopman_ablation_Donly_nu1e5.csv",
+  "sha256": "ac323d51c2745ccd3b30900a661d6e2856fb4c82094ad8a421b43662418bf0c4",
+  "selection": "training curve (test L2 and max Re every epoch)"
+ },
+ "ns_ablations/sensitivity/M8.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_e4e5/best_koopman_nu1e5_M8.pt",
+  "sha256": "a5ad770db7f78d34bf5fec061c1140f97d4bef05daf4a3b65cfa80cca492a399",
+  "selection": "lowest test L2 over 500 epochs (no validation split); trained by navier_stokes/train_lgnkm.py --modes 8"
+ },
+ "ns_ablations/sensitivity/M8_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_e4e5/curve_koopman_nu1e5_M8.csv",
+  "sha256": "528cb960116740443b72234cb8d9b9aa05de861c4654adee22e40286687e75ac",
+  "selection": "training curve"
+ },
+ "ns_ablations/sensitivity/M16.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_e4e5/best_koopman_nu1e5_M16.pt",
+  "sha256": "78d88c0914d6cd125cbbb174d60dddefe5a8df1427a214fa991c9005c6c24b39",
+  "selection": "lowest test L2 over 500 epochs (no validation split); trained by navier_stokes/train_lgnkm.py --modes 16"
+ },
+ "ns_ablations/sensitivity/M16_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_e4e5/curve_koopman_nu1e5_M16.csv",
+  "sha256": "2189e4474fe5c35591844fead59971f1148d3333ba7a77856d7a1f1bc53a7fc5",
+  "selection": "training curve"
+ },
+ "ns_ablations/sensitivity/normalized_input.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_e4e5/best_nu1e5_spatial.pt",
+  "sha256": "7c2ecb7d15f9363dd1d44dd1fce125517af25a9f8892262fd934985ee1199f4d",
+  "selection": "lowest test loss over 1000 epochs in its own per-frame metric on z-scored data (train_normalized_input.py); differs from the main protocol"
+ },
+ "ns_ablations/sensitivity/normalized_input_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/checkpoints/curve_nu1e5_spatial.csv",
+  "sha256": "bc210ed9cce870ec1103fb3c31cf7c856a395c5833ce3a15acf030dc5be4b53a",
+  "selection": "training curve (own metric, 1000 epochs)"
+ },
+ "ns_ablations/structural/SD_s0_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Unnormalized/checkpoints/curve_koopman_nu1e5_raw.csv",
+  "sha256": "ad0d56e1d2a23df39a1cb781ef8017eec3a0a755252fb93f0332c432d1380146",
+  "selection": "training curve of the main S-D model, nu=1e-5, seed 0 (Table A.2 S-D column, mean +- SD of the minimum test L2)"
+ },
+ "ns_ablations/structural/SD_s1_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Multiseed/checkpoints/curve_koopman_nu1e5_s1.csv",
+  "sha256": "17bf13798312ef0e99f9d3e1642192de84a3719a64be150cb1a342fe393a57d9",
+  "selection": "training curve of the main S-D model, nu=1e-5, seed 1 (Table A.2 S-D column, mean +- SD of the minimum test L2)"
+ },
+ "ns_ablations/structural/SD_s2_curve.csv": {
+  "source": "/home/shafayeth/LGN_koopman/Multiseed/checkpoints/curve_koopman_nu1e5_s2.csv",
+  "sha256": "ce66ec575df3a74866780d62cedc953ccb2d74bb3c0d938fe9e8819c830aec88",
+  "selection": "training curve of the main S-D model, nu=1e-5, seed 2 (Table A.2 S-D column, mean +- SD of the minimum test L2)"
+ }
+}

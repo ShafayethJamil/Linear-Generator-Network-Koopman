@@ -160,6 +160,12 @@ if __name__ == '__main__':
     verify_nlse(a.ckpt_dir)
     if a.data_dir:
         verify_accuracy(a.ckpt_dir, a.data_dir)
+    # appendix experiments, one module per family in verify_parts/
+    import importlib.util, glob
+    for path in sorted(glob.glob(os.path.join(HERE, 'verify_parts', '*.py'))):
+        spec = importlib.util.spec_from_file_location(os.path.basename(path)[:-3], path)
+        mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+        mod.run(a.ckpt_dir, check, check_pm, a.data_dir)
     n_fail = results.count(False)
     print(f"\n{len(results) - n_fail} of {len(results)} checks pass")
     sys.exit(1 if n_fail else 0)

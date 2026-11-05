@@ -1,0 +1,6 @@
+metric,lgn_direct,interp_lgn,interp_true
+mean_all_frac,0.189839,0.199956,0.134767
+mean_phase_0.25,0.182968,0.190671,0.117706
+mean_phase_0.5,0.189695,0.204819,0.159126
+mean_phase_0.75,0.196855,0.204377,0.127468
+mean_frac_tau<=15,0.129494,0.132170,0.064761

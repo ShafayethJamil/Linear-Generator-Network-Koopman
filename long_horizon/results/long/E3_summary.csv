@@ -1,0 +1,5 @@
+model,first_blowup_t (max|w|>1e3),rel_l2_t20,rel_l2_final
+lgn,never,0.359138,1.003167
+fno,81,0.227866,15958262.000000
+lran,37,0.367237,inf
+kno,never,0.240967,1.028605

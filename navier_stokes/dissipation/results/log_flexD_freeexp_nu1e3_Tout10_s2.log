@@ -1,0 +1,68 @@
+nohup: ignoring input
+Device: cuda
+Loading /home/shafayeth/LGN_koopman/ns_V1e-3_N5000_T50.mat ...
+  Format: HDF5, key='u', raw shape=(50, 64, 64, 5000)
+  Parsed: N=5000 H=64 W=64 T=50
+  Train: torch.Size([1000, 64, 64, 10]) -> torch.Size([1000, 64, 64, 10])
+  Data stats: mean=0.0000 std=0.8660 (NO normalization)
+FlexD (freeexp) params: 598,850
+
+[flexD_freeexp_nu1e3_s2] FLEX-D (freeexp)  T_in=10 T_out=10 r=32 modes=12 epochs=500
+
+[0010] train=0.0463 test=0.0455 Re(lam)_max=-0.10848 p=1.081 <-- BEST
+[0020] train=0.0291 test=0.0274 Re(lam)_max=-0.10311 p=1.105 <-- BEST
+[0030] train=0.0245 test=0.0253 Re(lam)_max=-0.09918 p=1.121
+[0040] train=0.0226 test=0.0207 Re(lam)_max=-0.09613 p=1.132
+[0050] train=0.0185 test=0.0172 Re(lam)_max=-0.09372 p=1.141
+[0060] train=0.0174 test=0.0209 Re(lam)_max=-0.09133 p=1.148
+[0070] train=0.0147 test=0.0153 Re(lam)_max=-0.08930 p=1.155
+[0080] train=0.0130 test=0.0134 Re(lam)_max=-0.08743 p=1.160
+[0090] train=0.0139 test=0.0152 Re(lam)_max=-0.08564 p=1.165
+[0100] train=0.0122 test=0.0132 Re(lam)_max=-0.08413 p=1.169
+[0110] train=0.0119 test=0.0110 Re(lam)_max=-0.08274 p=1.174 <-- BEST
+[0120] train=0.0134 test=0.0128 Re(lam)_max=-0.08150 p=1.178
+[0130] train=0.0101 test=0.0127 Re(lam)_max=-0.08037 p=1.181
+[0140] train=0.0106 test=0.0113 Re(lam)_max=-0.07930 p=1.185
+[0150] train=0.0096 test=0.0099 Re(lam)_max=-0.07822 p=1.187
+[0160] train=0.0089 test=0.0083 Re(lam)_max=-0.07732 p=1.189 <-- BEST
+[0170] train=0.0090 test=0.0090 Re(lam)_max=-0.07648 p=1.192
+[0180] train=0.0087 test=0.0088 Re(lam)_max=-0.07571 p=1.194
+[0190] train=0.0097 test=0.0097 Re(lam)_max=-0.07500 p=1.196
+[0200] train=0.0083 test=0.0078 Re(lam)_max=-0.07437 p=1.197
+[0210] train=0.0089 test=0.0083 Re(lam)_max=-0.07375 p=1.199
+[0220] train=0.0072 test=0.0068 Re(lam)_max=-0.07319 p=1.200 <-- BEST
+[0230] train=0.0074 test=0.0080 Re(lam)_max=-0.07264 p=1.202
+[0240] train=0.0067 test=0.0079 Re(lam)_max=-0.07217 p=1.203
+[0250] train=0.0067 test=0.0072 Re(lam)_max=-0.07170 p=1.205
+[0260] train=0.0062 test=0.0065 Re(lam)_max=-0.07124 p=1.206
+[0270] train=0.0067 test=0.0060 Re(lam)_max=-0.07086 p=1.207 <-- BEST
+[0280] train=0.0061 test=0.0060 Re(lam)_max=-0.07045 p=1.208
+[0290] train=0.0058 test=0.0067 Re(lam)_max=-0.07007 p=1.208
+[0300] train=0.0055 test=0.0057 Re(lam)_max=-0.06972 p=1.209
+[0310] train=0.0052 test=0.0055 Re(lam)_max=-0.06939 p=1.210
+[0320] train=0.0055 test=0.0061 Re(lam)_max=-0.06904 p=1.210
+[0330] train=0.0048 test=0.0051 Re(lam)_max=-0.06874 p=1.211 <-- BEST
+[0340] train=0.0046 test=0.0051 Re(lam)_max=-0.06841 p=1.212
+[0350] train=0.0046 test=0.0052 Re(lam)_max=-0.06811 p=1.212
+[0360] train=0.0045 test=0.0049 Re(lam)_max=-0.06784 p=1.213 <-- BEST
+[0370] train=0.0044 test=0.0049 Re(lam)_max=-0.06756 p=1.213
+[0380] train=0.0042 test=0.0048 Re(lam)_max=-0.06731 p=1.213
+[0390] train=0.0041 test=0.0047 Re(lam)_max=-0.06709 p=1.214
+[0400] train=0.0041 test=0.0045 Re(lam)_max=-0.06690 p=1.214 <-- BEST
+[0410] train=0.0040 test=0.0045 Re(lam)_max=-0.06672 p=1.214 <-- BEST
+[0420] train=0.0040 test=0.0045 Re(lam)_max=-0.06658 p=1.214
+[0430] train=0.0039 test=0.0045 Re(lam)_max=-0.06646 p=1.215
+[0440] train=0.0039 test=0.0045 Re(lam)_max=-0.06636 p=1.215
+[0450] train=0.0039 test=0.0044 Re(lam)_max=-0.06629 p=1.215 <-- BEST
+[0460] train=0.0038 test=0.0044 Re(lam)_max=-0.06623 p=1.215 <-- BEST
+[0470] train=0.0038 test=0.0044 Re(lam)_max=-0.06620 p=1.215 <-- BEST
+[0480] train=0.0038 test=0.0044 Re(lam)_max=-0.06618 p=1.215
+[0490] train=0.0038 test=0.0044 Re(lam)_max=-0.06617 p=1.215
+[0500] train=0.0038 test=0.0044 Re(lam)_max=-0.06617 p=1.215
+
+============================================================
+DONE [FlexD freeexp flexD_freeexp_nu1e3_s2]  best test_l2 = 0.0044
+final learned exponent p = 1.2151  (imposed form = 2)
+============================================================
+Now run analysis:
+  python lgn_flexD.py --data /home/shafayeth/LGN_koopman/ns_V1e-3_N5000_T50.mat --Dparam freeexp --tag flexD_freeexp_nu1e3_s2 --analyze

@@ -1,0 +1,42 @@
+{
+ "fhn/periodic_Du0.01_s0.pt": {
+  "source": "/home/shafayeth/LGN_koopman/FHN/checkpoints/best_koopman_rd_Du0.01_r32.pt",
+  "sha256": "c2dead138b1b26c2a99552522b7e84341864c10821e49b33415ebbe8822db700",
+  "selection": "lowest test L2 over 500 epochs (no validation split); torch.manual_seed(0) at import"
+ },
+ "fhn/periodic_Du0.001_s0.pt": {
+  "source": "/home/shafayeth/LGN_koopman/FHN/checkpoints/best_koopman_rd_Du0.001_r32.pt",
+  "sha256": "9d8ea94fbd449a7e894d8e44da95f847058542c9d253d8619f567ee628ea7ce2",
+  "selection": "lowest test L2 over 500 epochs (no validation split); torch.manual_seed(0) at import"
+ },
+ "fhn/neumann_Du0.01_s0.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_non_periodic/best_koopman_fhn_dct_Du0.01_s0.pt",
+  "sha256": "35f28e26475492eeaf549bc8cb60705216764e074c3582b3325f3dd1c7e612c1",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final epoch identical to 6 decimals"
+ },
+ "fhn/neumann_Du0.01_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_non_periodic/best_koopman_fhn_dct_Du0.01_s1.pt",
+  "sha256": "bcafd0879988d89ba01848e79d4e483e39e0662ec80cbcdf5c3d33f92f43c890",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final epoch identical to 6 decimals"
+ },
+ "fhn/neumann_Du0.01_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_non_periodic/best_koopman_fhn_dct_Du0.01_s2.pt",
+  "sha256": "bb2450184e909346e1084f2c800ba6ed8322e2e347e3a28cc13f517576d6ed65",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final epoch identical to 6 decimals"
+ },
+ "fhn/neumann_Du0.001_s0.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_non_periodic/best_koopman_fhn_dct_Du0.001_s0.pt",
+  "sha256": "b63c5d0e0bc766a48c9bddca48c3835b269f019472ec6ebd9313d9a030dab1ed",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final epoch identical to 6 decimals"
+ },
+ "fhn/neumann_Du0.001_s1.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_non_periodic/best_koopman_fhn_dct_Du0.001_s1.pt",
+  "sha256": "a80833d10ccb33e7c4e8a591ba14fb8886cc57b868225ad5436990bb923233fd",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final epoch identical to 6 decimals"
+ },
+ "fhn/neumann_Du0.001_s2.pt": {
+  "source": "/home/shafayeth/LGN_koopman/Rebuttal_NeurIPS/checkpoints_non_periodic/best_koopman_fhn_dct_Du0.001_s2.pt",
+  "sha256": "1c7cdaa0f7ea664ab3b0e40ee23f12dfa878926cdf380bc235e829ad0c3246da",
+  "selection": "lowest test L2 over 500 epochs (no validation split); best and final epoch identical to 6 decimals"
+ }
+}

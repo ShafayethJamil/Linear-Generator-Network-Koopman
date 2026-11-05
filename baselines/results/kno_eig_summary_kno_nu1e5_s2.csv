@@ -1,0 +1,7 @@
+metric,value
+pct_stable_linear_core (|1+muW|<=1),25.02
+max_abs_perstep_multiplier,2.2638e+01
+r2_dominant_absmu_vs_k2,0.43446
+decompose,8
+n_modes,256
+n_eigs,8192

@@ -1,0 +1,17 @@
+metric,value
+test_rel_l2_full_volume,0.245377
+l2_step1,0.116095
+l2_step2,0.123646
+l2_step3,0.139598
+l2_step4,0.156667
+l2_step5,0.177250
+l2_step6,0.201435
+l2_step7,0.230780
+l2_step8,0.265642
+l2_step9,0.309999
+l2_step10,0.367422
+max_abs_mu,1.327814
+pct_stable,18.75
+r,32
+modes,12
+T_out,10

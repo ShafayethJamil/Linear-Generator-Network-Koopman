@@ -1,0 +1,8 @@
+metric,value
+T_extended,200
+koopman_max_omega,4.635270595550537
+fno_max_omega,8261165056.0
+koopman_stable,1
+fno_stable,0
+koopman_t1_l2,0.10735511779785156
+fno_t1_l2,0.07715354114770889

@@ -1,0 +1,16 @@
+metric,value
+test_rel_l2_full_volume,0.167130
+l2_step1,0.087221
+l2_step2,0.096966
+l2_step3,0.103428
+l2_step4,0.111925
+l2_step5,0.123210
+l2_step6,0.137920
+l2_step7,0.155874
+l2_step8,0.179412
+l2_step9,0.208796
+l2_step10,0.247722
+o,32
+m,16
+r_power,8
+epochs,500

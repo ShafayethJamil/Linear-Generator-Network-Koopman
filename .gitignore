@@ -1,6 +1,12 @@
-checkpoints/**/*.pt
+# checkpoints ship as a release asset; only the manifests are tracked
+checkpoints/**
+!checkpoints/
+!checkpoints/MANIFEST*.json
 data/**/*.mat
 data/**/*.zip
+outputs/
+runs/
+transfer/runs/
 nlse/runs/
 __pycache__/
 *.pyc

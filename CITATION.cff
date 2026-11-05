@@ -8,7 +8,7 @@ authors:
   - family-names: Kapadia
     given-names: Rehan
     affiliation: University of Southern California
-repository-code: "https://github.com/ShafayethJamil/lgn-km"
+repository-code: "https://github.com/ShafayethJamil/Linear-Generator-Network-Koopman"
 license: MIT
 preferred-citation:
   type: conference-paper
