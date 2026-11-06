@@ -6,7 +6,7 @@
 
 <p align="center"><img src="assets/architecture.png" width="85%"></p>
 
-## The idea in one paragraph
+## The Main idea
 
 Linear systems are transparent: their generator's eigenvalues tell you how every mode decays and oscillates. Nonlinear PDEs have no such generator, but the Koopman view says the dynamics become linear in the right lifted coordinates. LGN-KM learns that lift with a neural encoder. In the lifted space, at every Fourier mode k, it learns the generator in the form
 
