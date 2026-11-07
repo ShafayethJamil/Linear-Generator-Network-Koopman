@@ -8,25 +8,33 @@
 
 ## The Main idea
 
-Linear systems are transparent: their generator's eigenvalues tell you how every mode decays and oscillates. Nonlinear PDEs have no such generator, but the Koopman view says the dynamics become linear in the right lifted coordinates. LGN-KM learns that lift with a neural encoder. In the lifted space, at every Fourier mode k, it learns the generator in the form
+Linear systems are transparent: their generator's eigenvalues tell you how every mode decays and oscillates. Nonlinear PDEs have no such generator, but the Koopman view says the dynamics become linear in the right lifted coordinates. LGN-KM learns that lift with a neural encoder. In the lifted space, at every Fourier mode $`k`$, it learns the generator in the form
 
-**L_k = S − D_k**
+```math
+L_k = S - D_k, \qquad S = \tfrac{1}{2}\left(P - P^{\top}\right), \qquad D_k = \mathrm{diag}\!\left(\mathrm{softplus}(d) + \mathrm{softplus}(\alpha)\,\frac{|k|^2}{k_{\max}^2}\right)
+```
 
-- **S is skew-symmetric** and shared across modes. It is the conservative coupling, and it only rotates.
-- **D_k is a positive diagonal** that grows with |k|². It is mode-selective damping.
+- **$`S`$ is skew-symmetric** and shared across modes. It is the conservative coupling, and it only rotates.
+- **$`D_k`$ is a positive diagonal** that grows with $`|k|^2`$. It is mode-selective damping.
 
-So every eigenvalue has Re(λ) ≤ 0 by construction, the whole spectrum is legible from about 560 parameters, and the state at any time t is a single matrix exponential exp(L_k t). There is no step-by-step rollout.
+So every eigenvalue has $`\mathrm{Re}(\lambda) \le 0`$ by construction, the whole spectrum is legible from about 560 parameters, and the state at any time $`t`$ is a single matrix exponential, $`z_k(t) = e^{L_k t}\, z_k(0)`$. There is no step-by-step rollout.
 
 ## What you get
 
-- **A spectrum for 2D turbulence.** On Navier–Stokes, the generator gives a complete multi-branch dispersion relation: 4,608 eigenvalues, all stable. Small scales decay faster, as viscosity demands. A learnable dissipation exponent, initialized at 1, rises to 2.2–2.4.
-- **Physics you can check against a known answer.** On optical-fiber pulse propagation (the nonlinear Schrödinger equation), the rotation rates of S trace the fiber's dispersion relation. The fastest one gives the group-velocity dispersion to within 3.1%, with **no fitted constant**: |β₂| = 2 f_max / (Ω₁₅² Δz).
-- **Structure shared across regimes.** Models trained independently at viscosities 100× apart learn the same singular-value profile of S (R² = 0.87).
+- **A spectrum for 2D turbulence.** On Navier–Stokes, the generator gives a complete multi-branch dispersion relation: 4,608 eigenvalues, all stable. Small scales decay faster, as viscosity demands. A learnable dissipation exponent $`p`$ in $`|k|^{p}`$, initialized at 1, rises to 2.2–2.4.
+- **Physics you can check against a known answer.** On optical-fiber pulse propagation (the nonlinear Schrödinger equation), the rotation rates of $`S`$ trace the fiber's dispersion relation. The fastest one, $`f_{\max}`$, gives the group-velocity dispersion to within 3.1%, with **no fitted constant**:
+
+  ```math
+  |\beta_2| = \frac{2 f_{\max}}{\Omega_{15}^2\, \Delta z}
+  ```
+
+  where $`\Omega_{15}`$ is the band-edge frequency and $`\Delta z`$ the snapshot spacing along the fiber.
+- **Structure shared across regimes.** Models trained independently at viscosities 100× apart learn the same singular-value profile of $`S`$ ($`R^2 = 0.87`$).
 - **Stable, any-time prediction.**
-  - Rollouts stay bounded to t = 200, where FNO and LRAN diverge.
-  - Querying t = 200 costs 1.9 ms, against 299 ms for FNO's 200 autoregressive steps.
+  - Rollouts stay bounded to $`t = 200`$, where FNO and LRAN diverge.
+  - Querying $`t = 200`$ costs 1.9 ms, against 299 ms for FNO's 200 autoregressive steps.
   - Queries between training frames beat interpolating the model's own frames at every time.
-- **Transfer with little data.** Freezing S from the ν = 10⁻⁵ model and fine-tuning the rest at ν = 10⁻³ gives 18% lower error than training from scratch with 50 trajectories.
+- **Transfer with little data.** Freezing $`S`$ from the $`\nu = 10^{-5}`$ model and fine-tuning the rest at $`\nu = 10^{-3}`$ gives 18% lower error than training from scratch with 50 trajectories.
 - **Beyond Navier–Stokes.** The same architecture, unchanged, works on FitzHugh–Nagumo reaction–diffusion, including no-flux boundaries via a cosine lift.
 
 <p align="center">
