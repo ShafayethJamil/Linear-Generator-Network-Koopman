@@ -31,10 +31,10 @@ So every eigenvalue has Re(λ) ≤ 0 by construction, the whole spectrum is legi
 
 <p align="center">
 <img src="assets/ns_spectrum.png" width="31%">
-<img src="assets/transfer_curves.png" width="31%">
+<img src="assets/nlse_readout.png" width="31%">
 <img src="assets/transfer_budget.png" width="31%">
 </p>
-<p align="center"><sub>Left: all 4,608 eigenvalues of the learned generator for 2D turbulence (ν = 10⁻⁵), coloured by |k|². Middle: transfer from ν = 10⁻⁵ to ν = 10⁻³ with S frozen, vs training from scratch, using 50 trajectories. Right: test error against the number of training trajectories.</sub></p>
+<p align="center"><sub>Left: all 4,608 eigenvalues of the learned generator for 2D Navier–Stokes (ν = 10⁻³), coloured by |k|²; every one sits left of the imaginary axis. Middle: fiber dispersion |β₂| read from the rotation rates of S vs the true value, mean error under 3.1% with no fitted constant. Right: transfer from ν = 10⁻⁵ to ν = 10⁻³ with S frozen beats training from scratch at every data budget up to 500 trajectories.</sub></p>
 
 ## Try it in a minute
 
