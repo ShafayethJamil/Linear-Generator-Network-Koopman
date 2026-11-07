@@ -24,9 +24,7 @@ So every eigenvalue has $`\mathrm{Re}(\lambda) \le 0`$ by construction, the whol
 - **A spectrum for 2D turbulence.** On Navier–Stokes, the generator gives a complete multi-branch dispersion relation: 4,608 eigenvalues, all stable. Small scales decay faster, as viscosity demands. A learnable dissipation exponent $`p`$ in $`|k|^{p}`$, initialized at 1, rises to 2.2–2.4.
 - **Physics you can check against a known answer.** On optical-fiber pulse propagation (the nonlinear Schrödinger equation), the rotation rates of $`S`$ trace the fiber's dispersion relation. The fastest one, $`f_{\max}`$, gives the group-velocity dispersion to within 3.1%, with **no fitted constant**:
 
-  ```math
-  |\beta_2| = \frac{2 f_{\max}}{\Omega_{15}^2\, \Delta z}
-  ```
+  $$|\beta_2| = \frac{2 f_{\max}}{\Omega_{15}^2 \Delta z}$$
 
   where $`\Omega_{15}`$ is the band-edge frequency and $`\Delta z`$ the snapshot spacing along the fiber.
 - **Structure shared across regimes.** Models trained independently at viscosities 100× apart learn the same singular-value profile of $`S`$ ($`R^2 = 0.87`$).
