@@ -31,10 +31,10 @@ So every eigenvalue has Re(λ) ≤ 0 by construction, the whole spectrum is legi
 
 <p align="center">
 <img src="assets/ns_spectrum.png" width="31%">
-<img src="assets/nlse_routing.png" width="31%">
-<img src="assets/nlse_readout.png" width="31%">
+<img src="assets/transfer_curves.png" width="31%">
+<img src="assets/transfer_budget.png" width="31%">
 </p>
-<p align="center"><sub>Left: all 4,608 eigenvalues of the learned generator for 2D turbulence (ν = 10⁻⁵), coloured by |k|². Middle: each optical frequency's energy routed onto the rotation rates of S; dashed, the fiber's true phase advance. Right: |β₂| read from the generator vs the true value, for 15 models.</sub></p>
+<p align="center"><sub>Left: all 4,608 eigenvalues of the learned generator for 2D turbulence (ν = 10⁻⁵), coloured by |k|². Middle: transfer from ν = 10⁻⁵ to ν = 10⁻³ with S frozen, vs training from scratch, using 50 trajectories. Right: test error against the number of training trajectories.</sub></p>
 
 ## Try it in a minute
 
